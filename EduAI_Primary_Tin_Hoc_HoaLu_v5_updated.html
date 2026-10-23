@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduAI Primary: Hệ Thống Trợ Lý AI Chẩn Đoán Sư Phạm & Cá Nhân Hóa Dạy Học Tin Học Tiểu Học</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+        }
+        .banner-gradient {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body.quiz-mode { background: linear-gradient(160deg,#eef2f7 0%,#cfd8e3 100%); }
+        .quiz-banner { background: linear-gradient(120deg,#1e3a8a 0%,#2563eb 100%); }
+        .opt { width:100%; text-align:left; padding:.9rem 1.2rem; border-radius:1rem; border:1px solid #d1d5db; background:#fff; font-size:.85rem; color:#1f2937; transition:.15s; cursor:pointer; }
+        .opt:hover:not(:disabled) { border-color:#2563eb; background:#f0f7ff; }
+        .opt.selected { background:#dbeafe; border-color:#2563eb; font-weight:700; color:#111827; }
+        .opt.correct { background:#d1fae5; border-color:#10b981; font-weight:700; color:#065f46; }
+        .opt.wrong { background:#fee2e2; border-color:#ef4444; font-weight:700; color:#991b1b; }
+        .opt:disabled { cursor:default; }
+        .ai-panel { background:#eff6ff; border:1px solid #bfdbfe; border-radius:1rem; padding:1.1rem 1.3rem; box-shadow:0 4px 14px rgba(30,64,175,.08); }
+        .ai-tip { background:#e0f2fe; border-left:4px solid #0284c7; border-radius:.5rem; padding:.7rem 1rem; color:#075985; font-size:.8rem; }
+
+        body { background: radial-gradient(1200px 600px at 10% -10%, #1d4ed8 0%, transparent 60%), radial-gradient(900px 500px at 100% 0%, #7c3aed 0%, transparent 55%), #0b1230; background-attachment: fixed; }
+        .blob { position: fixed; border-radius: 9999px; filter: blur(80px); opacity:.35; pointer-events:none; animation: float 14s ease-in-out infinite; }
+        body.quiz-mode .blob { display:none; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-30px)} }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:none} }
+        .fade-up { animation: fadeUp .7s ease both; }
+        .glass { background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); backdrop-filter: blur(14px); }
+        .grad-text { background: linear-gradient(90deg,#fde68a,#fbbf24,#fb923c); -webkit-background-clip:text; background-clip:text; color:transparent; }
+        .feature:hover { transform: translateY(-4px); }
+        .feature { transition:.25s; }
+        .tile { background:#f8fafc; border:1px solid #e2e8f0; border-radius:1rem; padding:.9rem; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+    <div class="blob w-96 h-96 bg-blue-500 -top-20 -left-20"></div><div class="blob w-80 h-80 bg-fuchsia-500 bottom-10 right-0" style="animation-delay:-6s"></div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="app" class="w-full flex-grow flex items-center justify-center p-3 sm:p-6">
+        
+        <!-- SCREEN 1: LANDING (thiết kế cho Ngày hội Nhà giáo sáng tạo 2026) -->
+        <div id="screen-landing" class="w-full max-w-6xl fade-up">
+            <div class="text-center text-white mb-8">
+                <span class="glass inline-block px-5 py-2 rounded-full text-[11px] sm:text-xs font-bold tracking-wider uppercase text-amber-200">🏆 Nhà giáo sáng tạo với Công nghệ số &amp; Trí tuệ nhân tạo 2026</span>
+                <h1 class="text-5xl sm:text-7xl font-extrabold tracking-tight mt-5 grad-text">EduAI Primary</h1>
+                <p class="text-base sm:text-xl font-semibold mt-3 text-blue-100 max-w-3xl mx-auto">Hệ thống Trợ lý AI chẩn đoán sư phạm &amp; cá nhân hóa dạy học Tin học tiểu học</p>
+                <p class="text-xs sm:text-sm text-blue-200/80 mt-2">Bám sát SGK Tin học 3 – 4 – 5, bộ Kết nối tri thức với cuộc sống • Chương trình GDPT 2018</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-5 glass rounded-3xl p-6 text-white flex flex-col items-center text-center">
+                    <div class="text-[11px] font-bold uppercase tracking-widest text-amber-200 mb-3">Giáo viên thực hiện</div>
+                    <div class="w-36 h-36 rounded-full p-1.5 bg-gradient-to-tr from-amber-300 to-blue-500 shadow-xl mb-3">
+                        <img id="teacher-avatar-img" alt="Cô Khánh Vân" class="w-full h-full object-cover rounded-full border-4 border-white">
+                    </div>
+                    <h2 class="font-extrabold text-xl">Nguyễn Trần Khánh Vân</h2>
+                    <p class="text-amber-200 text-xs font-semibold mt-1">Giáo viên Tin học • Trường Tiểu học Hoa Lư</p>
+                    <p class="text-blue-100/80 text-xs mt-1">Phường Thanh Khê, TP. Đà Nẵng</p>
+                    <div class="grid grid-cols-3 gap-2 w-full mt-5">
+                        <div class="bg-white/10 rounded-2xl py-3"><div class="text-2xl font-extrabold text-amber-300">34</div><div class="text-[10px] text-blue-100">Bài học</div></div>
+                        <div class="bg-white/10 rounded-2xl py-3"><div class="text-2xl font-extrabold text-amber-300">170</div><div class="text-[10px] text-blue-100">Câu hỏi</div></div>
+                        <div class="bg-white/10 rounded-2xl py-3"><div class="text-2xl font-extrabold text-amber-300">3</div><div class="text-[10px] text-blue-100">Khối lớp</div></div>
+                    </div>
+                    <div class="text-xs text-blue-100 mt-4"><i class="fa-solid fa-envelope text-amber-300"></i> khanhvan180895@gmail.com</div>
+                </div>
+
+                <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 card-shadow">
+                    <h3 class="text-xl font-extrabold text-gray-800 flex items-center gap-2"><i class="fa-solid fa-rocket text-blue-600"></i> Bắt đầu thử thách năng lực số</h3>
+                    <p class="text-xs text-gray-500 mt-1 mb-5">Nhập thông tin để lưu điểm vào Bảng Vàng EduAI.</p>
+                    <form id="login-form" onsubmit="startApp(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-user text-blue-600 mr-1"></i> Họ và tên học sinh</label>
+                            <input type="text" id="student-name" required placeholder="Nhập họ và tên của em" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1"><i class="fa-solid fa-graduation-cap text-blue-600 mr-1"></i> Lớp</label>
+                            <input type="text" id="student-class" required placeholder="Ví dụ: 5/2, 4/1, 3/3" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg flex items-center justify-center gap-2">Vào khám phá bài học <i class="fa-solid fa-arrow-right"></i></button>
+                    </form>
+                    <div class="grid grid-cols-3 gap-3 mt-4">
+                        <button onclick="openModal('modal-guide')" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 rounded-xl text-xs"><i class="fa-solid fa-book-open"></i> Hướng dẫn</button>
+                        <button onclick="openModal('modal-teacher')" class="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2.5 rounded-xl text-xs"><i class="fa-solid fa-chalkboard-user"></i> Giới thiệu</button>
+                        <button onclick="openModal('modal-ranking')" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 rounded-xl text-xs"><i class="fa-solid fa-trophy"></i> Xếp hạng</button>
+                    </div>
+                    <div class="mt-5 pt-4 border-t border-gray-100 grid grid-cols-3 gap-2 text-center">
+                        <div><div class="w-9 h-9 mx-auto rounded-full bg-blue-100 text-blue-700 font-extrabold flex items-center justify-center">1</div><p class="text-[11px] text-gray-600 mt-1">Chọn đáp án</p></div>
+                        <div><div class="w-9 h-9 mx-auto rounded-full bg-emerald-100 text-emerald-700 font-extrabold flex items-center justify-center">2</div><p class="text-[11px] text-gray-600 mt-1">Kiểm tra &amp; Phân tích AI</p></div>
+                        <div><div class="w-9 h-9 mx-auto rounded-full bg-amber-100 text-amber-700 font-extrabold flex items-center justify-center">3</div><p class="text-[11px] text-gray-600 mt-1">Nhận lộ trình ôn tập</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+                <div class="feature glass rounded-2xl p-4 text-white"><div class="text-2xl">🏫</div><h4 class="font-bold text-sm mt-1">Thực tiễn</h4><p class="text-[11px] text-blue-100/90 mt-1">Dùng trực tiếp trong tiết Tin học, bám sát từng bài, từng trang SGK.</p></div>
+                <div class="feature glass rounded-2xl p-4 text-white"><div class="text-2xl">🤖</div><h4 class="font-bold text-sm mt-1">Sáng tạo</h4><p class="text-[11px] text-blue-100/90 mt-1">Trợ lý AI chẩn đoán lỗi sai và chỉ rõ mục SGK cần đọc lại.</p></div>
+                <div class="feature glass rounded-2xl p-4 text-white"><div class="text-2xl">📈</div><h4 class="font-bold text-sm mt-1">Tác động</h4><p class="text-[11px] text-blue-100/90 mt-1">Báo cáo độ chính xác, thời gian và lộ trình ôn tập cá nhân hoá.</p></div>
+                <div class="feature glass rounded-2xl p-4 text-white"><div class="text-2xl">🌱</div><h4 class="font-bold text-sm mt-1">Bền vững &amp; có trách nhiệm</h4><p class="text-[11px] text-blue-100/90 mt-1">Một tệp HTML chạy trên mọi máy, dễ nhân rộng; chỉ dùng tên, lớp của học sinh.</p></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: GRADE SELECTION -->
+        <div id="screen-grades" class="w-full max-w-5xl bg-white rounded-3xl card-shadow p-6 sm:p-10 hidden">
+            <div class="flex items-center justify-between pb-6 border-b border-gray-100 mb-8">
+                <div>
+                    <span id="user-greeting" class="text-xs sm:text-sm font-semibold text-blue-600 uppercase tracking-wider">Xin chào học sinh</span>
+                    <h2 class="text-xl sm:text-3xl font-extrabold text-gray-800">Chọn Khối Lớp Học Tập</h2>
+                </div>
+                <button onclick="backToLanding()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-xl text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Đăng xuất
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Grade 3 Card -->
+                <div onclick="selectGrade(3)" class="bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-3xl p-8 cursor-pointer transition transform hover:-translate-y-1.5 card-shadow flex flex-col justify-between h-64">
+                    <div>
+                        <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-2xl font-bold mb-4">3</div>
+                        <h3 class="text-2xl font-bold">Tin Học Lớp 3</h3>
+                        <p class="text-blue-100 text-sm mt-1">Kết nối tri thức với cuộc sống</p>
+                    </div>
+                    <div class="flex items-center justify-between text-sm font-semibold text-blue-100 pt-4 border-t border-white/20">
+                        <span>6 Chủ đề • 16 Bài học • Trợ lý AI chẩn đoán</span>
+                        <i class="fa-solid fa-arrow-right text-lg"></i>
+                    </div>
+                </div>
+
+                <!-- Grade 4 Card -->
+                <div onclick="selectGrade(4)" class="bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-3xl p-8 cursor-pointer transition transform hover:-translate-y-1.5 card-shadow flex flex-col justify-between h-64">
+                    <div>
+                        <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-2xl font-bold mb-4">4</div>
+                        <h3 class="text-2xl font-bold">Tin Học Lớp 4</h3>
+                        <p class="text-emerald-100 text-sm mt-1">Kết nối tri thức với cuộc sống</p>
+                    </div>
+                    <div class="flex items-center justify-between text-sm font-semibold text-emerald-100 pt-4 border-t border-white/20">
+                        <span>6 Chủ đề • 9 Bài trọng tâm • Trợ lý AI chẩn đoán</span>
+                        <i class="fa-solid fa-arrow-right text-lg"></i>
+                    </div>
+                </div>
+
+                <!-- Grade 5 Card -->
+                <div onclick="selectGrade(5)" class="bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-3xl p-8 cursor-pointer transition transform hover:-translate-y-1.5 card-shadow flex flex-col justify-between h-64">
+                    <div>
+                        <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-2xl font-bold mb-4">5</div>
+                        <h3 class="text-2xl font-bold">Tin Học Lớp 5</h3>
+                        <p class="text-amber-100 text-sm mt-1">Kết nối tri thức với cuộc sống</p>
+                    </div>
+                    <div class="flex items-center justify-between text-sm font-semibold text-amber-100 pt-4 border-t border-white/20">
+                        <span>6 Chủ đề • 9 Bài trọng tâm • Trợ lý AI chẩn đoán</span>
+                        <i class="fa-solid fa-arrow-right text-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: CHAPTERS & LESSONS EXPLORER -->
+        <div id="screen-curriculum" class="w-full max-w-5xl bg-white rounded-3xl card-shadow p-6 sm:p-10 hidden">
+            <div class="flex items-center justify-between pb-6 border-b border-gray-100 mb-6">
+                <div class="flex items-center gap-4">
+                    <button onclick="backToGrades()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold p-3 rounded-xl transition">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <span id="curriculum-grade-label" class="text-xs sm:text-sm font-semibold text-blue-600 uppercase tracking-wider">Khối Lớp</span>
+                        <h2 id="curriculum-title" class="text-xl sm:text-2xl font-extrabold text-gray-800">Chương Trình Sách Giáo Khoa Tin Học</h2>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="openModal('modal-ranking')" class="bg-purple-100 text-purple-700 hover:bg-purple-200 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-trophy"></i> Bảng Xếp Hạng
+                    </button>
+                    <div id="student-badge" class="bg-blue-50 text-blue-700 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border border-blue-200 hidden sm:block">
+                        Học sinh: ...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chapters & Lessons Container -->
+            <div id="chapters-container" class="space-y-4 max-h-[65vh] overflow-y-auto pr-2">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- SCREEN 4: QUIZ + KIỂM TRA & PHÂN TÍCH AI -->
+        <div id="screen-quiz" class="w-full max-w-3xl bg-white rounded-3xl card-shadow overflow-hidden hidden">
+            <div class="quiz-banner text-white text-center px-6 py-7">
+                <h2 class="text-2xl sm:text-3xl font-extrabold">Khơi Nguồn Đam Mê Tin Học Cùng Cô Vân</h2>
+                <p class="text-xs sm:text-sm font-semibold text-blue-100 mt-1">Trường Tiểu học Hoa Lư - Phường Thanh Khê - TP. Đà Nẵng</p>
+                <span class="inline-block mt-3 px-4 py-1 rounded-full bg-white/15 border border-white/30 text-xs font-bold">🏆 Thử Thách Năng Lực Số 4.0</span>
+            </div>
+            <div class="p-6 sm:p-9">
+                <div class="flex items-center justify-between mb-3">
+                    <button onclick="backToCurriculum()" class="text-xs font-semibold text-gray-600 hover:text-blue-700 flex items-center gap-1.5"><i class="fa-solid fa-arrow-left"></i> Trở về bài học</button>
+                    <span id="quiz-lesson-title" class="text-xs font-bold text-blue-700 text-right"></span>
+                </div>
+                <div class="h-2 rounded-full bg-gray-200 overflow-hidden mb-3"><div id="quiz-bar" class="h-full bg-emerald-500 transition-all" style="width:0%"></div></div>
+                <div class="flex items-center justify-between text-xs font-bold mb-3">
+                    <span id="quiz-progress" class="text-gray-500">Câu hỏi 1 / 5</span>
+                    <span class="text-orange-600"><i class="fa-regular fa-clock"></i> <span id="quiz-timer">00:00</span></span>
+                </div>
+                <div class="bg-slate-50 border border-gray-200 rounded-2xl p-5 mb-4" style="border-left:5px solid #2563eb">
+                    <p id="quiz-question" class="text-sm sm:text-base font-semibold text-gray-800 leading-relaxed"></p>
+                </div>
+                <div id="quiz-options" class="space-y-3"></div>
+                <div id="ai-assistant-box" class="ai-panel mt-5 hidden"></div>
+                <div class="flex justify-end mt-5">
+                    <button id="check-btn" onclick="checkAnswer()" disabled class="bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-2xl shadow-md text-sm">Kiểm tra &amp; Phân tích AI</button>
+                    <button id="next-btn" onclick="nextQuestion()" class="hidden bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-2xl shadow-md text-sm">Câu tiếp theo <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: KẾT QUẢ & LỘ TRÌNH ÔN TẬP -->
+        <div id="screen-result" class="w-full max-w-2xl bg-white rounded-3xl card-shadow overflow-hidden hidden">
+            <div class="quiz-banner text-white text-center px-6 py-6">
+                <div class="text-4xl">🎉</div>
+                <h3 class="text-2xl font-extrabold mt-1">Hoàn Thành Bài Học!</h3>
+                <p id="result-message" class="text-blue-100 text-sm mt-1"></p>
+            </div>
+            <div class="p-6 sm:p-8">
+                <div class="text-center mb-5">
+                    <div class="text-xs font-semibold text-blue-600">Điểm số bài học</div>
+                    <div id="result-score" class="text-5xl font-extrabold text-blue-700">5 / 5</div>
+                    <div id="rank-notification" class="text-xs font-bold text-emerald-600 mt-1">Đã cập nhật điểm vào bảng xếp hạng EduAI!</div>
+                </div>
+                <div id="result-stats" class="grid grid-cols-3 gap-3 mb-5"></div>
+                <div class="rounded-2xl border border-blue-100 bg-blue-50/60 p-4 mb-6">
+                    <div class="font-bold text-blue-800 text-sm mb-2"><i class="fa-solid fa-robot"></i> Lộ trình ôn tập cá nhân hoá từ Trợ lý Sư phạm AI</div>
+                    <div id="result-review" class="text-xs text-gray-700 space-y-2"></div>
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="backToCurriculum()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3.5 rounded-xl">Danh sách bài học</button>
+                    <button onclick="openModal('modal-ranking'); renderLeaderboard();" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 rounded-xl shadow-md"><i class="fa-solid fa-trophy"></i> Xem Xếp Hạng</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODALS -->
+    <!-- Guide Modal -->
+    <div id="modal-guide" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 card-shadow relative">
+            <button onclick="closeModal('modal-guide')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl font-bold">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-book-open text-amber-500"></i> Hướng Dẫn Sử Dụng
+            </h3>
+            <div class="space-y-3 text-sm text-gray-600">
+                <p>1. Nhập đầy đủ <strong>Họ và tên</strong> và <strong>Lớp</strong> của em ở trang chủ.</p>
+                <p>2. Chọn khối lớp phù hợp (Khối 3, Khối 4 hoặc Khối 5) theo chuẩn SGK Kết nối tri thức với cuộc sống.</p>
+                <p>3. Mỗi bài học gồm <strong>5 câu hỏi trắc nghiệm</strong>. Sau khi chọn đáp án, em bấm <strong>Kiểm tra &amp; Phân tích AI</strong> để <strong>Trợ lý Sư phạm AI</strong> phân tích chẩn đoán kiến thức và đưa ra lời khuyên cá nhân hóa từ cô Khánh Vân.</p>
+                <p>4. Điểm số hoàn thành bài học sẽ được cập nhật tự động lên <strong>Bảng Xếp Hạng EduAI</strong>.</p>
+            </div>
+            <button onclick="closeModal('modal-guide')" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition">
+                Đã hiểu
+            </button>
+        </div>
+    </div>
+
+    <!-- Teacher Modal -->
+    <div id="modal-teacher" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 card-shadow relative text-center">
+            <button onclick="closeModal('modal-teacher')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl font-bold">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 border-4 border-blue-600 shadow-md">
+                <img id="teacher-avatar-modal" alt="Cô Khánh Vân" class="w-full h-full object-cover">
+            </div>
+            <h3 class="text-xl font-bold text-gray-900">Nguyễn Trần Khánh Vân</h3>
+            <p class="text-blue-600 font-semibold text-sm mt-1">Giáo viên Tin học • Trường Tiểu học Hoa Lư</p>
+            <div class="text-gray-600 text-xs mt-3 leading-relaxed space-y-2 text-left bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
+                <p><strong>• Đơn vị công tác:</strong> Trường Tiểu học Hoa Lư, Thanh Khê, Đà Nẵng.</p>
+                <p><strong>• Chuyên môn:</strong> Giảng dạy bộ môn Tin học tiểu học theo chuẩn GDPT 2018 (Kết nối tri thức với cuộc sống).</p>
+                <p><strong>• Sáng kiến tham gia:</strong> <em>EduAI Primary: Hệ thống trợ lý AI chẩn đoán sư phạm & cá nhân hóa dạy học Tin học tiểu học</em>.</p>
+            </div>
+            <button onclick="closeModal('modal-teacher')" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition">
+                Đóng
+            </button>
+        </div>
+    </div>
+
+    <!-- Ranking Modal -->
+    <div id="modal-ranking" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 card-shadow relative">
+            <button onclick="closeModal('modal-ranking')" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl font-bold">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-trophy text-yellow-500"></i> Bảng Vàng Trực Tuyến EduAI 🌐
+            </h3>
+            <p class="text-xs text-gray-500 mb-4">Bảng xếp hạng trực tuyến đồng bộ thời gian thực từ mọi thiết bị của học sinh.</p>
+            
+            <div id="leaderboard-container" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                <!-- Populated via JS -->
+            </div>
+
+            <button onclick="closeModal('modal-ranking')" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition">
+                Đóng
+            </button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-6 text-[11px] text-blue-200/70 px-4">© 2026 EduAI Primary • Sản phẩm dự thi “Nhà giáo sáng tạo với công nghệ số và trí tuệ nhân tạo 2026” – Bảng A • GV: Nguyễn Trần Khánh Vân, Trường Tiểu học Hoa Lư<br>AI chỉ hỗ trợ gợi ý học tập theo SGK, không thay thế giáo viên; ứng dụng không thu thập dữ liệu cá nhân ngoài họ tên và lớp nhập trong phiên học.</footer>
+
+    <!-- EMBEDDED JAVASCRIPT WITH COMPLETE SGK CURRICULUM & AI DIAGNOSTICS -->
+    <script>
+        const avatarBase64 = "data:image/jpeg;base64,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";
+    
+    // EMBEDDED DATA FOR GRADES 3, 4, 5 BASED ON TEXTBOOK TOCS & LESSONS
+    const curriculumData = {
+        3: {
+            title: "Tin Học Lớp 3 (Kết nối tri thức với cuộc sống)",
+            chapters: [
+                {
+                    name: "Chủ đề 1. Máy tính và em",
+                    lessons: [
+                        { id: "3_1", title: "Bài 1. Thông tin và quyết định", questions: [
+                            { q: "Trong cuộc sống, tiếng chuông báo thức mỗi sáng nhắc bạn Minh điều gì?", options: ["Sắp đến giờ đi học", "Đến giờ đi ngủ", "Đến giờ ăn tối", "Đến giờ xem ti vi"], correct: 0, advice: "Cô Khánh Vân lưu ý: Tiếng chuông báo thức là thông tin quan trọng giúp bạn Minh nhận biết thời gian và đưa ra quyết định thức dậy chuẩn bị đi học!" },
+                            { q: "Ba dạng thông tin thường gặp trong cuộc sống là gì?", options: ["Chữ, hình ảnh, âm thanh", "Máy tính, điện thoại, ti vi", "Sách, vở, bút thước", "Đất, nước, không khí"], correct: 0, advice: "Cô Khánh Vân hướng dẫn: Thế giới quanh ta có ba dạng thông tin quen thuộc nhất mà các em tiếp nhận qua các giác quan là dạng chữ, hình ảnh và âm thanh." },
+                            { q: "Trước khi ra khỏi nhà để đi đá bóng, Minh quyết định mặc trang phục nào?", options: ["Quần áo thể thao và giày yêu thích", "Đồng phục trường", "Áo mưa", "Quần áo ngủ"], correct: 0, advice: "Chính xác! Thông tin về mục đích ra ngoài giúp Minh đưa ra quyết định chọn trang phục phù hợp." },
+                            { q: "Câu nào sau đây là 'Thông tin' trong tình huống Minh muốn kết bạn với An?", options: ["Minh thấy An vui vẻ, hoà đồng", "Minh quyết định kết bạn với An", "Minh chạy đến gặp An ngay", "Minh rủ An đi chơi"], correct: 0, advice: "Cô Khánh Vân giải thích: Những điều em quan sát, biết được ('Minh thấy An vui vẻ') chính là thông tin." },
+                            { q: "Để đưa ra quyết định chính xác, điều đầu tiên con người cần phải có là gì?", options: ["Thông tin", "Tiền bạc", "Máy tính", "Điện thoại"], correct: 0, advice: "Đúng vậy! Nguyên tắc cốt lõi trong Tin học: 'Cần phải có thông tin để ra quyết định'." }
+                        ]},
+                        { id: "3_2", title: "Bài 2. Xử lí thông tin", questions: [
+                            { q: "Bộ phận nào của con người làm nhiệm vụ xử lí thông tin, tạo ra quyết định?", options: ["Bộ não", "Đôi tai", "Đôi mắt", "Chân tay"], correct: 0, advice: "Cô Khánh Vân nhắc lại: Bộ não là trung tâm huy động, xử lí thông tin thu nhận từ các giác quan và điều khiển mọi hành động." },
+                            { q: "Trong quá trình con người hát theo video, mắt và tai làm nhiệm vụ gì?", options: ["Thu nhận thông tin (lời và nhạc)", "Xử lí thông tin", "Ra quyết định hát", "Không làm gì cả"], correct: 0, advice: "Chính xác! Mắt theo dõi, tai lắng nghe chính là quá trình thu nhận thông tin đầu vào." },
+                            { q: "Khi thả diều, dây diều bị chùng và diều không lên cao, người thả diều quyết định:", options: ["Chạy ngược chiều gió để diều căng ra", "Thả trôi diều", "Ngồi nghỉ", "Cắt đứt dây diều"], correct: 0, advice: "Đúng rồi! Đây là ví dụ thực tế về chu trình: Thu nhận thông tin -> Xử lí -> Quyết định hành động." },
+                            { q: "Các thiết bị điện trong gia đình như ti vi, điều hoà, quạt điện điều khiển được là nhờ:", options: ["Tiếp nhận thông tin để xử lí và hành động", "Tự suy nghĩ như con người", "Không cần thông tin", "Chạy bằng hơi nước"], correct: 0, advice: "Cô Khánh Vân lưu ý: Máy móc (như ti vi nhận số kênh từ điều khiển) cũng tiếp nhận thông tin để quyết định hành động." },
+                            { q: "Khi em bấm phím tăng nhiệt độ trên bếp từ, bếp từ thực hiện quá trình gì?", options: ["Tiếp nhận thông tin, xử lí và điều chỉnh nhiệt độ", "Tự động tắt nguồn", "Phát ra âm thanh cảnh báo", "Không phản ứng gì"], correct: 0, advice: "Chính xác tuyệt đối!" }
+                        ]},
+                        { id: "3_3", title: "Bài 3. Máy tính và em", questions: [
+                            { q: "Máy tính để bàn có các bộ phận cơ bản nào?", options: ["Thân máy, màn hình, bàn phím, chuột", "Màn hình, máy in, loa", "Thân máy, bàn phím, máy chiếu", "Chuột, bàn phím, máy quét"], correct: 0, advice: "Cô Khánh Vân nhấn mạnh: 4 bộ phận cơ bản của máy tính để bàn gồm thân máy, màn hình, bàn phím và chuột." },
+                            { q: "Bộ phận nào là quan trọng nhất của máy tính, chứa bộ xử lí điều khiển mọi hoạt động?", options: ["Thân máy", "Màn hình", "Bàn phím", "Chuột"], correct: 0, advice: "Chính xác! Thân máy chứa bộ xử lí ví như 'bộ não' của máy tính." },
+                            { q: "Trong điện thoại thông minh và máy tính bảng, bộ phận nào vừa làm chuột vừa làm bàn phím?", options: ["Màn hình cảm ứng", "Thân máy", "Loa", "Cổng sạc"], correct: 0, advice: "Đúng vậy! Màn hình cảm ứng cho phép chạm, vuốt để nhập thông tin và điều khiển thiết bị." },
+                            { q: "Quy tắc an toàn nào sau đây là NÊN làm khi sử dụng máy tính?", options: ["Hỏi người lớn khi muốn bật/tắt máy tính", "Tự ý cắm rút dây điện khi lỏng", "Vừa sạc pin vừa dùng điện thoại", "Dùng khăn ướt lau máy tính"], correct: 0, advice: "Cô Khánh Vân nhắc nhở các em luôn tuân thủ an toàn về điện để bảo vệ bản thân và thiết bị." },
+                            { q: "Khi phát hiện có mùi khét từ dây điện máy tính, em nên làm gì?", options: ["Chạy ra báo với người lớn", "Tiếp tục ngồi học", "Tự ý lấy kéo cắt dây", "Đổ nước vào dập tắt"], correct: 0, advice: "Chính xác! An toàn tuyệt đối là ưu tiên hàng đầu." }
+                        ]},
+                        { id: "3_4", title: "Bài 4. Làm việc với máy tính", questions: [
+                            { q: "Khi sử dụng máy tính, khoảng cách hợp lý giữa mắt và màn hình là bao nhiêu?", options: ["50 - 80 cm", "10 - 20 cm", "1 - 2 mét", "30 cm"], correct: 0, advice: "Cô Khánh Vân hướng dẫn tư thế chuẩn: Ngồi thẳng lưng, mắt cách màn hình 50 - 80 cm để phòng bệnh cận thị và vẹo cột sống." },
+                            { q: "Sau khoảng thời gian sử dụng máy tính liên tục, các em nên dừng lại nghỉ ngơi?", options: ["Khoảng 30 phút", "5 tiếng", "Cả ngày", "Không cần nghỉ"], correct: 0, advice: "Đúng rồi! Cần cho mắt và cơ thể thư giãn sau mỗi 30 phút làm việc với máy tính." },
+                            { q: "Thao tác dùng ngón trỏ nhấn nhanh nút trái chuột hai lần liên tiếp gọi là gì?", options: ["Nháy đúp chuột", "Nháy chuột", "Nháy nút phải chuột", "Kéo thả chuột"], correct: 0, advice: "Chính xác! Nháy đúp chuột thường dùng để khởi động phần mềm từ màn hình nền." },
+                            { q: "Thao tác nào dùng để di chuyển một biểu tượng trên màn hình nền đến vị trí khác?", options: ["Kéo thả chuột", "Nháy chuột", "Nháy nút phải", "Nháy đúp chuột"], correct: 0, advice: "Đúng vậy! Nhấn giữ nút trái chuột và di chuyển đến vị trí mới rồi thả ra." },
+                            { q: "Đâu là trình tự TẮT MÁY TÍNH đúng cách?", options: ["Start -> Power -> Shut down", "Rút phích cắm điện trực tiếp", "Nhấn giữ nút nguồn trên thân máy", "Tắt màn hình trước"], correct: 0, advice: "Tuyệt vời! Luôn tắt máy tính đúng cách qua hệ điều hành để bảo vệ phần cứng và dữ liệu." }
+                        ]},
+                        { id: "3_5", title: "Bài 5. Sử dụng bàn phím", questions: [
+                            { q: "Hai phím có gờ nổi trên hàng phím cơ sở là hai phím nào?", options: ["F và J", "D và K", "A và S", "G và H"], correct: 0, advice: "Cô Khánh Vân hướng dẫn: Hai ngón trỏ đặt lên hai phím có gờ F và J là vị trí xuất phát chuẩn 10 ngón." },
+                            { q: "Khi gõ bàn phím xong, các ngón tay phải trở về vị trí xuất phát trên hàng phím nào?", options: ["Hàng phím cơ sở", "Hàng phím số", "Hàng phím trên", "Hàng phím dưới"], correct: 0, advice: "Chính xác! Hàng phím cơ sở là 'nhà' của các ngón tay." },
+                            { q: "Khu vực nào chiếm nhiều phím nhất trên bàn phím máy tính?", options: ["Khu vực chính", "Khu vực phím số phụ", "Khu vực phím chức năng", "Khu vực phím điều khiển"], correct: 0, advice: "Đúng vậy! Khu vực chính gồm hàng phím số, hàng phím trên, cơ sở, dưới và phím cách." },
+                            { q: "Phần mềm nào được giới thiệu trong sách để luyện tập gõ 10 ngón?", options: ["Kiran's Typing Tutor", "Microsoft Word", "Paint", "Scratch"], correct: 0, advice: "Chính xác! Kiran's Typing Tutor giúp luyện gõ phím rất hiệu quả." },
+                            { q: "Lợi ích của việc gõ bàn phím đúng cách (10 ngón) là gì?", options: ["Gõ nhanh, chính xác, tiết kiệm thời gian và bảo vệ sức khoẻ", "Giúp bàn phím sạch hơn", "Không cần nhìn máy tính", "Giúp máy tính chạy nhanh hơn"], correct: 0, advice: "Chuẩn xác hoàn toàn!" }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 2. Mạng máy tính và Internet",
+                    lessons: [
+                        { id: "3_6", title: "Bài 6. Khám phá thông tin trên Internet", questions: [
+                            { q: "Khi truy cập Internet, em có thể xem được những thông tin gì?", options: ["Tin tức, phim hoạt hình, ca nhạc, học tập", "Chỉ xem được thời tiết", "Chỉ chơi được trò chơi ngoại tuyến", "Không xem được gì cả"], correct: 0, advice: "Cô Khánh Vân chia sẻ: Internet là kho thông tin khổng lồ phục vụ học tập và giải trí lành mạnh." },
+                            { q: "Đặc điểm nổi bật của thông tin trên Internet là gì?", options: ["Là kho thông tin khổng lồ và được cập nhật thường xuyên", "Luôn luôn chính xác 100%", "Có sẵn trong thân máy", "Không thể tìm kiếm được"], correct: 0, advice: "Chính xác! Internet chứa lượng thông tin vô tận từ khắp nơi trên thế giới." },
+                            { q: "Tại sao học sinh khi sử dụng Internet cần có sự cho phép và hướng dẫn của người lớn?", options: ["Vì có thể gặp thông tin không phù hợp, độc hại hoặc lừa đảo", "Vì máy tính sẽ bị hỏng ngay lập tức", "Vì tiền điện sẽ tăng cao", "Vì người lớn thích dùng cùng"], correct: 0, advice: "Cô Khánh Vân đặc biệt lưu ý: Không phải thông tin nào trên Internet cũng phù hợp với lứa tuổi tiểu học." },
+                            { q: "Hành động nào sau đây là NÊN làm khi gặp thông tin lạ, đáng sợ trên mạng?", options: ["Chia sẻ ngay với người lớn hoặc thầy cô tin cậy", "Tự mình tìm hiểu thêm", "Giấu kín không nói với ai", "Làm theo hướng dẫn trong trang web đó"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Trang thông tin nào sau đây là KHÔNG PHÙ HỢP với học sinh?", options: ["Trang thông tin có nội dung bạo lực, độc hại", "Trang thông tin về trò chơi dân gian", "Trang thông tin lịch sử, địa lí", "Trang học tập trực tuyến"], correct: 0, advice: "Đúng vậy! Tránh xa các nội dung bạo lực và không lành mạnh." }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 3. Tổ chức lưu trữ, tìm kiếm và trao đổi thông tin",
+                    lessons: [
+                        { id: "3_7", title: "Bài 7. Sắp xếp để dễ tìm", questions: [
+                            { q: "Việc sắp xếp các đồ vật hoặc dữ liệu một cách hợp lý mang lại lợi ích gì?", options: ["Giúp tìm kiếm nhanh hơn và quản lý dễ dàng hơn", "Làm đồ vật biến mất", "Tốn nhiều thời gian hơn", "Không có tác dụng gì"], correct: 0, advice: "Cô Khánh Vân giải thích: Sắp xếp đồ vật cùng loại thành nhóm giúp ta tìm đồ rất nhanh khi cần." },
+                            { q: "Trong tủ quần áo gia đình, việc chia ngăn đựng quần và ngăn đựng áo thể hiện điều gì?", options: ["Sắp xếp đồ vật hợp lý theo nhóm", "Làm tủ quần áo nặng hơn", "Cất giấu quần áo", "Trang trí tủ"], correct: 0, advice: "Chính xác!" },
+                            { q: "Sắp xếp được định nghĩa trong Tin học là gì?", options: ["Phân loại đồ vật, dữ liệu vào các nhóm có điểm chung", "Xóa bỏ các đồ vật cũ", "Trộn lẫn mọi thứ với nhau", "Đổi tên đồ vật"], correct: 0, advice: "Đúng vậy! Sắp xếp chính là phân loại theo tiêu chí chung." },
+                            { q: "Khi các quyển sách được xếp ngăn nắp theo loại (Sách giáo khoa, Vở viết, Truyện tranh), em sẽ tìm sách thế nào?", options: ["Tìm ngay trong ngăn tương ứng rất nhanh", "Phải lục tung cả chồng sách", "Không thể tìm thấy", "Hỏi bạn bè"], correct: 0, advice: "Chuẩn xác!" },
+                            { q: "Để quản lý góc học tập gọn gàng, em nên làm gì?", options: ["Sắp xếp đồ dùng học tập đúng nơi quy định", "Vứt bừa bãi trên bàn", "Cất hết vào gầm giường", "Nhờ bố mẹ dọn hộ mãi mãi"], correct: 0, advice: "Tuyệt vời!" }
+                        ]},
+                        { id: "3_8", title: "Bài 8. Sơ đồ hình cây. Tổ chức thông tin trong máy tính", questions: [
+                            { q: "Cấu tạo chính của một cây xanh gồm những phần nào được ứng dụng để làm sơ đồ?", options: ["Rễ, thân, cành và lá", "Hoa, quả, hạt", "Đất, nước, ánh sáng", "Cành, nhánh, hoa"], correct: 0, advice: "Cô Khánh Vân hướng dẫn: Sơ đồ hình cây giúp biểu diễn cách sắp xếp, phân loại thông tin trực quan." },
+                            { q: "Trong máy tính, các dữ liệu được lưu trữ trong cấu trúc nào?", options: ["Cây thư mục (Ổ đĩa, thư mục, tệp)", "Chỉ lưu trong chuột", "Lưu trên màn hình nền", "Lưu trong loa"], correct: 0, advice: "Chính xác! Cấu trúc cây thư mục giúp quản lý tệp và thư mục ngăn nắp." },
+                            { q: "Tệp (file) trong máy tính dùng để làm gì?", options: ["Lưu trữ các dữ liệu cụ thể như văn bản, hình ảnh, bài hát", "Chỉ để làm đẹp máy tính", "Làm máy tính nặng thêm", "Không có chức năng gì"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Thư mục (folder) trong máy tính có vai trò gì?", options: ["Chứa các thư mục con và các tệp bên trong", "Chỉ dùng để xóa dữ liệu", "Là phần cứng máy tính", "Phát ra âm thanh"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Sử dụng sơ đồ hình cây để phân loại sở thích giúp chúng ta điều gì?", options: ["Dễ hình dung, dễ quản lý và tìm kiếm thông tin", "Làm cây mọc lá thật", "Vẽ tranh nghệ thuật", "Học toán nhanh hơn"], correct: 0, advice: "Đúng chuẩn!" }
+                        ]},
+                        { id: "3_9", title: "Bài 9. Thực hành với tệp và thư mục trong máy tính", questions: [
+                            { q: "Để mở một thư mục trên máy tính, em thực hiện thao tác nào với chuột?", options: ["Nháy đúp chuột vào biểu tượng thư mục", "Nháy nút phải chuột chọn Delete", "Di chuyển chuột ra chỗ khác", "Nhấn phím nguồn"], correct: 0, advice: "Cô Khánh Vân hướng dẫn thực hành: Nháy đúp chuột nhanh hai lần liên tiếp để mở thư mục." },
+                            { q: "Khi làm việc trong phòng thực hành máy tính, em nên tạo thư mục riêng để làm gì?", options: ["Lưu trữ bài tập của mình ngăn nắp, không bị nhầm lẫn với bạn khác", "Làm đầy ổ đĩa C", "Để máy tính bị lỗi", "Khoá máy tính lại"], correct: 0, advice: "Chính xác!" },
+                            { q: "Biểu tượng của thư mục trong hệ điều hành Windows thường có hình gì và màu gì?", options: ["Hình cặp tài liệu màu vàng", "Hình tờ giấy trắng", "Hình máy tính", "Hình thùng rác"], correct: 0, advice: "Đúng vậy! Thư mục có hình cặp tài liệu màu vàng đặc trưng." },
+                            { q: "Thao tác nào dùng để đổi tên một thư mục hoặc tệp?", options: ["Nháy nút phải chuột chọn Rename (hoặc chọn rồi nhấn phím đổi tên)", "Kéo thả vào thùng rác", "Nháy đúp chuột liên tục", "Tắt máy tính"], correct: 0, advice: "Chính xác!" },
+                            { q: "Khi không còn dùng đến tệp nháp, em có thể đưa tệp đó vào đâu?", options: ["Thùng rác (Recycle Bin)", "Màn hình nền", "Ổ đĩa D", "Cổng USB"], correct: 0, advice: "Tuyệt vời!" }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 4. Đạo đức, pháp luật và văn hoá trong môi trường số",
+                    lessons: [
+                        { id: "3_10", title: "Bài 10. Bảo vệ thông tin khi dùng máy tính", questions: [
+                            { q: "Thông tin cá nhân và gia đình bao gồm những gì cần được bảo vệ?", options: ["Họ tên, số điện thoại, địa chỉ nhà, mật khẩu", "Màu sắc yêu thích", "Tên các bộ phim hoạt hình", "Số lượng bút chì"], correct: 0, advice: "Cô Khánh Vân lưu ý: Không bao giờ tự ý chia sẻ thông tin cá nhân trên mạng khi chưa được người lớn cho phép." },
+                            { q: "Tại sao em không nên cung cấp mật khẩu tài khoản của mình cho bạn bè?", options: ["Để tránh bị kẻ xấu lợi dụng đánh cắp tài khoản hoặc thông tin riêng", "Vì bạn bè không biết dùng", "Vì mật khẩu rất ngắn", "Vì máy tính sẽ hỏng"], correct: 0, advice: "Chính xác! Giữ bí mật mật khẩu là nguyên tắc an toàn số quan trọng." },
+                            { q: "Hành vi nào thể hiện ý thức bảo vệ thông tin khi dùng máy tính chung ở trường?", options: ["Đăng xuất tài khoản cá nhân sau khi sử dụng xong", "Xóa tất cả phần mềm của trường", "Đổi mật khẩu máy tính của cô giáo", "Tắt nguồn đột ngột"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Khi nhận được tin nhắn lạ trên mạng đe dọa hoặc yêu cầu cung cấp thông tin, em nên làm gì?", options: ["Báo ngay cho bố mẹ, thầy cô giáo biết", "Làm theo mọi yêu cầu", "Kết bạn với người đó", "Xóa máy tính"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Bảo vệ thông tin cá nhân trên môi trường số giúp em tránh được điều gì?", options: ["Bị kẻ xấu làm phiền, lừa đảo hoặc bắt nạt", "Bị cận thị", "Bị đau tay", "Hết pin máy tính"], correct: 0, advice: "Chuẩn xác!" }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 5. Ứng dụng tin học",
+                    lessons: [
+                        { id: "3_11", title: "Bài 11. Bài trình chiếu của em", questions: [
+                            { q: "Phần mềm trình chiếu giúp em tạo ra sản phẩm gì?", options: ["Các trang chiếu (slide) chứa văn bản, hình ảnh sinh động", "Chỉ tạo ra văn bản thuần túy", "Chỉ vẽ tranh sơn dầu", "Chỉ nghe nhạc MP3"], correct: 0, advice: "Cô Khánh Vân giới thiệu: Phần mềm trình chiếu giúp em báo cáo, thuyết trình trước lớp rất hấp dẫn." },
+                            { q: "Mỗi trang trong bài trình chiếu được gọi là gì?", options: ["Trang chiếu (Slide)", "Trang giấy", "Trang web", "Thư mục"], correct: 0, advice: "Chính xác! Bài trình chiếu gồm nhiều trang chiếu liên tiếp." },
+                            { q: "Trên trang chiếu, ngoài chữ viết (văn bản), em có thể chèn thêm gì để sinh động?", options: ["Hình ảnh minh họa", "Cục sạc điện thoại", "Dây cáp mạng", "Không chèn được gì nữa"], correct: 0, advice: "Đúng vậy! Hình ảnh làm trang chiếu trực quan và thu hút hơn." },
+                            { q: "Để khởi động phần mềm trình chiếu PowerPoint, em thường làm gì?", options: ["Nháy đúp chuột vào biểu tượng phần mềm trên màn hình nền", "Rút phích cắm điện", "Mở thùng rác", "Bật quạt máy"], correct: 0, advice: "Chính xác!" },
+                            { q: "Khi làm xong bài trình chiếu, em cần thực hiện thao tác gì để không bị mất bài?", options: ["Lưu tệp (Save) vào thư mục của mình", "Tắt máy ngay lập tức", "Đập bàn phím", "In ra giấy tất cả các trang"], correct: 0, advice: "Tuyệt vời!" }
+                        ]},
+                        { id: "3_12", title: "Bài 12. Tìm hiểu về thế giới tự nhiên", questions: [
+                            { q: "Phần mềm khám phá thế giới tự nhiên giúp học sinh lớp 3 làm gì?", options: ["Quan sát, tìm hiểu các loài động thực vật, hiện tượng tự nhiên sinh động", "Chỉ chơi game bạo lực", "Chỉ soạn thảo văn bản hành chính", "Lập trình robot phức tạp"], correct: 0, advice: "Cô Khánh Vân chia sẻ: Phần mềm học tập giúp mở rộng kiến thức khoa học tự nhiên rất thú vị." },
+                            { q: "Hình ảnh và âm thanh trong phần mềm tìm hiểu tự nhiên mang lại điều gì?", options: ["Giúp bài học trực quan, sinh động và dễ ghi nhớ", "Làm học sinh mỏi mắt", "Không có tác dụng gì", "Làm máy tính chậm lại"], correct: 0, advice: "Chính xác!" },
+                            { q: "Em có thể dùng máy tính để tra cứu thông tin về loài chim nào dưới đây?", options: ["Chim cánh cụt, đại bàng, sếu đầu đỏ", "Chim giấy", "Chim bằng bông", "Chim mây"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Khi kết hợp xem video thế giới tự nhiên trên máy tính, em cần chú ý điều gì về sức khỏe?", options: ["Ngồi đúng tư thế và nghỉ ngơi hợp lý sau 30 phút", "Dán mắt sát vào màn hình", "Tắt đèn hoàn toàn", "Đeo tai nghe hết công suất"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Ngoài phần mềm cài sẵn, em còn có thể tìm hiểu thiên nhiên qua đâu với sự trợ giúp của Internet?", options: ["Các trang web giáo dục thiếu nhi uy tín", "Trang web bạo lực", "Trò chơi chiến tranh", "Không tìm được"], correct: 0, advice: "Chuẩn xác!" }
+                        ]},
+                        { id: "3_13", title: "Bài 13. Luyện tập sử dụng chuột", questions: [
+                            { q: "Chuột máy tính thông thường có mấy nút chính và nút cuộn?", options: ["Nút trái, nút phải và nút cuộn ở giữa", "Chỉ có 1 nút duy nhất", "Có 5 nút bấm", "Không có nút nào"], correct: 0, advice: "Cô Khánh Vân nhắc lại cấu tạo chuột: Nút trái, nút phải và bánh xe cuộn." },
+                            { q: "Cách cầm chuột đúng cách bằng tay phải là gì?", options: ["Ngón trỏ đặt nút trái, ngón giữa đặt nút phải, các ngón khác giữ thân chuột", "Nắm chặt cả bàn tay đập mạnh", "Dùng ngón út bấm tất cả các nút", "Cầm ngược đuôi chuột lên trên"], correct: 0, advice: "Chính xác! Cầm chuột đúng tư thế giúp thao tác nhanh và không bị mỏi tay." },
+                            { q: "Thao tác nào dùng để lướt xem trang web hoặc văn bản dài lên xuống?", options: ["Sử dụng nút cuộn (bánh xe)", "Kéo màn hình ra ngoài", "Tắt máy tính", "Rút dây chuột"], correct: 0, advice: "Đúng vậy! Lăn nút cuộn giúp cuộn trang rất tiện lợi." },
+                            { q: "Khi di chuyển chuột trên bàn di chuột (mousepad), điều gì xảy ra trên màn hình?", options: ["Con trỏ chuột di chuyển tương ứng trên màn hình", "Màn hình tự động tắt", "Máy tính phát ra tiếng kêu", "Không có gì thay đổi"], correct: 0, advice: "Chính xác!" },
+                            { q: "Thao tác nháy nút phải chuột thường mở ra cái gì?", options: ["Bảng chọn (menu) chứa các lệnh nhanh", "Trò chơi mèo đuổi chuột", "Thùng rác", "Chương trình vẽ Paint"], correct: 0, advice: "Tuyệt vời!" }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 6. Giải quyết vấn đề với sự trợ giúp của máy tính",
+                    lessons: [
+                        { id: "3_14", title: "Bài 14. Em thực hiện công việc như thế nào?", questions: [
+                            { q: "Để thực hiện một công việc bất kỳ trong cuộc sống, bước đầu tiên con người cần làm gì?", options: ["Xác định rõ công việc cần làm và các bước thực hiện", "Làm ngay lập tức không cần nghĩ", "Nhờ người khác làm hộ hoàn toàn", "Đi ngủ"], correct: 0, advice: "Cô Khánh Vân hướng dẫn tư duy thuật toán: Mọi công việc đều cần chia nhỏ thành các bước rõ ràng." },
+                            { q: "Việc rửa cốc chén gồm các bước: (1) Tráng nước sạch; (2) Rửa bằng nước rửa bát; (3) Tráng lại nước sạch. Thứ tự hợp lý là:", options: ["(2) -> (1) -> (3)", "(1) -> (2) -> (3)", "(3) -> (2) -> (1)", "(2) -> (3) -> (1)"], correct: 0, advice: "Chính xác! Thứ tự các bước thực hiện đúng giúp công việc hoàn thành suôn sẻ." },
+                            { q: "Thuật ngữ 'Các bước thực hiện công việc' trong Tin học có ý nghĩa gì?", options: ["Là trình tự tuần tự các hành động để đạt kết quả mong muốn", "Là cách làm rối tung mọi thứ", "Là trò chơi điện tử", "Là tên một loại máy tính"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Nếu thực hiện sai thứ tự các bước luộc rau (Ví dụ: Cho rau vào nước lạnh đun chưa sôi rồi mới rửa rau), kết quả sẽ thế nào?", options: ["Công việc không đạt kết quả mong muốn", "Rau sẽ ngon hơn", "Không có gì thay đổi", "Nước tự biến mất"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Việc mô tả công việc bằng các bước giúp ích gì cho học sinh?", options: ["Rèn luyện tư duy logic và giải quyết vấn đề hiệu quả", "Làm học sinh mệt mỏi", "Tốn thời gian", "Không có ích gì"], correct: 0, advice: "Chuẩn xác!" }
+                        ]},
+                        { id: "3_15", title: "Bài 15. Công việc được thực hiện theo điều kiện", questions: [
+                            { q: "Trong cuộc sống, việc quyết định mang theo áo mưa hay không phụ thuộc vào điều gì?", options: ["Điều kiện thời tiết (trời có mưa hay không)", "Sở thích mặc quần áo", "Màu sắc của ô tô", "Giờ giấc trong ngày"], correct: 0, advice: "Cô Khánh Vân giải thích về cấu trúc điều kiện: 'Nếu... thì...' dựa vào tình hình thực tế." },
+                            { q: "Phát biểu nào sau đây thể hiện cấu trúc điều kiện 'Nếu... thì... '?", options: ["Nếu trời mưa thì em mặc áo mưa", "Em đi học lúc 7 giờ sáng", "Mặt trời mọc ở hướng đông", "Bàn phím có nhiều phím"], correct: 0, advice: "Chính xác! Có điều kiện xảy ra thì hành động tương ứng mới được thực hiện." },
+                            { q: "Khi đèn giao thông chuyển sang màu ĐỎ, phương tiện tham gia giao thông quyết định hành động gì?", options: ["Dừng lại", "Tiếp tục chạy nhanh", "Tăng tốc", "Quay đầu liên tục"], correct: 0, advice: "Đúng vậy! Điều kiện đèn đỏ dẫn đến hành động dừng lại." },
+                            { q: "Nếu ngày mai được nghỉ học (điều kiện), em sẽ quyết định làm gì?", options: ["Ở nhà giúp mẹ dọn dẹp và ôn bài", "Đến trường từ 5 giờ sáng", "Ngồi chờ trước cổng trường đóng cửa", "Khóc nhè"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Việc xử lý tình huống theo điều kiện giúp con người và máy tính làm gì?", options: ["Đưa ra quyết định linh hoạt, chính xác trong các tình huống khác nhau", "Làm máy tính bị đơ", "Tạo ra lỗi hệ thống", "Không cần suy nghĩ"], correct: 0, advice: "Tuyệt vời!" }
+                        ]},
+                        { id: "3_16", title: "Bài 16. Công việc của em và sự trợ giúp của máy tính", questions: [
+                            { q: "Máy tính trợ giúp con người trong những công việc nào dưới đây?", options: ["Tính toán siêu nhanh, lưu trữ kho dữ liệu lớn, giải trí và liên lạc", "Chỉ quét nhà và nấu cơm", "Chỉ trồng cây xanh", "Không hỗ trợ gì"], correct: 0, advice: "Cô Khánh Vân tổng kết: Máy tính là trợ thủ đắc lực giúp nâng cao hiệu quả học tập và đời sống." },
+                            { q: "Khi cần tính toán bảng số liệu hàng nghìn phép tính phức tạp, máy tính hơn con người ở điểm nào?", options: ["Tính toán cực kỳ nhanh chóng và chính xác tuyệt đối không mệt mỏi", "Biết khóc khi sai", "Cần nghỉ ngơi ăn uống", "Phải suy nghĩ lâu"], correct: 0, advice: "Chính xác!" },
+                            { q: "Sự kết hợp giữa 'Sức lao động/trí tuệ con người' và 'Sức mạnh tính toán của máy tính' mang lại điều gì?", options: ["Giúp giải quyết các công việc khó khăn, phức tạp một cách hiệu quả nhất", "Làm con người lười biếng hoàn toàn", "Gây hại cho xã hội", "Làm máy tính nổ tung"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Học sinh tiểu học sử dụng máy tính như một công cụ hỗ trợ học tập thông minh qua việc:", options: ["Soạn bài, vẽ tranh, học lập trình Scratch, tra cứu từ điển", "Chơi game thâu đêm", "Đập phá thiết bị", "Vứt máy tính xuống nước"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Qua môn Tin học lớp 3, em cảm thấy thế nào khi sử dụng máy tính khám phá thế giới?", options: ["Vui thích, hào hứng và biết sử dụng máy tính an toàn, hữu ích", "Sợ hãi không dám chạm vào", "Cảm thấy nhàm chán", "Muốn vứt bỏ máy tính"], correct: 0, advice: "Chúc mừng các em đã hoàn thành xuất sắc chương trình Tin học lớp 3 cùng cô Khánh Vân!" }
+                        ]}
+                    ]
+                }
+            ]
+        },
+        4: {
+            title: "Tin Học Lớp 4 (Kết nối tri thức với cuộc sống)",
+            chapters: [
+                {
+                    name: "Chủ đề 1. Máy tính và em",
+                    lessons: [
+                        { id: "4_1", title: "Bài 1. Phần cứng và phần mềm máy tính", questions: [
+                            { q: "Các bộ phận hữu hình của máy tính như màn hình, bàn phím, chuột, thân máy được gọi là gì?", options: ["Phần cứng", "Phần mềm", "Tệp tin", "Dữ liệu ảo"], correct: 0, advice: "Cô Khánh Vân giải thích: Phần cứng là những thiết bị vật lý ta có thể nhìn thấy và chạm vào." },
+                            { q: "Ứng dụng trò chơi, chương trình trình chiếu, hệ điều hành Windows là ví dụ về:", options: ["Phần mềm", "Phần cứng", "Dây cáp điện", "Ổ cắm điện"], correct: 0, advice: "Chính xác! Phần mềm không có hình dạng vật lý, ta chỉ thấy kết quả qua phần cứng." },
+                            { q: "Mối quan hệ giữa phần cứng và phần mềm máy tính là gì?", options: ["Phần mềm được lưu trữ trong phần cứng và điều khiển phần cứng hoạt động", "Chúng hoạt động hoàn toàn độc lập không liên quan nhau", "Phần cứng có thể tự làm mọi việc", "Phần mềm tự chạy trong không khí"], correct: 0, advice: "Đúng vậy! Máy tính cần cả hai yếu tố này mới làm việc được." },
+                            { q: "Hành động nào gây hại cho cả phần cứng và phần mềm máy tính?", options: ["Tắt máy tính bằng cách nhấn và giữ nút nguồn đột ngột hoặc làm rơi nước", "Tắt máy qua Start -> Shut down", "Đặt máy nơi khô ráo", "Vệ sinh bằng chổi mềm"], correct: 0, advice: "Cô Khánh Vân lưu ý: Luôn tắt máy đúng cách để bảo vệ hệ thống." },
+                            { q: "Thiết bị nào sau đây là phần cứng?", options: ["Máy in", "Phần mềm Word", "Trò chơi Scratch", "Ứng dụng từ điển"], correct: 0, advice: "Chính xác tuyệt đối!" }
+                        ]},
+                        { id: "4_2", title: "Bài 2. Gõ bàn phím đúng cách", questions: [
+                            { q: "Lợi ích của việc gõ bàn phím 10 ngón đúng cách là gì?", options: ["Gõ nhanh, chính xác, tiết kiệm thời gian và bảo vệ sức khoẻ", "Làm bàn phím kêu to hơn", "Giúp màn hình sáng hơn", "Không có lợi ích gì"], correct: 0, advice: "Cô Khánh Vân nhấn mạnh: Luyện gõ đúng cách giúp em không bị mỏi cổ, mỏi mắt." },
+                            { q: "Khi gõ các phím số ở hàng phím số, các ngón tay xuất phát từ hàng nào?", options: ["Hàng phím cơ sở", "Hàng phím số", "Hàng phím dưới", "Không cần đặt tay cố định"], correct: 0, advice: "Chính xác! Ngón tay vươn lên gõ hàng số rồi lại về hàng cơ sở." },
+                            { q: "Để gõ chữ hoa trên bàn phím, em thực hiện thế nào?", options: ["Nhấn giữ phím Shift (hoặc Caps Lock) rồi gõ phím chữ", "Chỉ gõ phím bình thường", "Nhấn phím Enter liên tục", "Nhấn phím Space"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Khi gõ văn bản tiếng Việt kiểu Telex, để có chữ 'â', em gõ như thế nào?", options: ["aa", "aw", "oo", "ee"], correct: 0, advice: "Cô Khánh Vân ôn lại quy tắc Telex: a+a = â, o+o = ô, e+e = ê, d+d = đ." },
+                            { q: "Trong kiểu gõ Telex, để có dấu sắc (sắc), em gõ thêm chữ cái nào ở cuối từ?", options: ["s", "f", "r", "x"], correct: 0, advice: "Tuyệt vời! s = sắc, f = huyền, r = hỏi, x = ngã, j = nặng." }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 2. Mạng máy tính và Internet",
+                    lessons: [
+                        { id: "4_3", title: "Bài 3. Thông tin trên trang web", questions: [
+                            { q: "Trên một trang web thông thường có thể chứa các loại thông tin nào?", options: ["Văn bản, hình ảnh, âm thanh, video và siêu liên kết", "Chỉ có văn bản thuần túy", "Chỉ có hình ảnh đen trắng", "Chỉ có tiếng kêu bíp bíp"], correct: 0, advice: "Cô Khánh Vân giới thiệu: Trang web kết hợp đa dạng các dạng thông tin sinh động." },
+                            { q: "Siêu liên kết (hyperlink) trên trang web có đặc điểm gì khi đưa con trỏ chuột vào?", options: ["Con trỏ chuột đổi thành hình bàn tay có ngón trỏ chỉ vào", "Máy tính tự động tắt nguồn", "Màn hình chuyển màu đỏ", "Không có hiện tượng gì"], correct: 0, advice: "Chính xác! Nháy vào siêu liên kết sẽ mở trang web hoặc vị trí mới." },
+                            { q: "Văn bản chứa văn bản, hình ảnh, video và siêu liên kết được gọi chung là gì?", options: ["Siêu văn bản", "Văn bản thô", "Tệp âm thanh", "Bức tranh vẽ"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Cố tình truy cập vào các trang web không phù hợp lứa tuổi có thể gây ra tác hại gì?", options: ["Suy nghĩ lệch lạc, bị dụ dỗ bắt nạt trên mạng và lãng phí thời gian", "Giúp học giỏi toán hơn", "Làm máy tính chạy nhanh gấp đôi", "Được thưởng quà lớn"], correct: 0, advice: "Cô Khánh Vân nhắc nhở học sinh luôn tuân thủ nguyên tắc an toàn khi lướt web." },
+                            { q: "Khi gặp thông tin lạ, đáng sợ trên trang web, em nên làm gì ngay?", options: ["Đóng trang web lại và báo cho người lớn biết", "Tiếp tục xem một mình", "Lưu lại vào máy tính", "Gửi cho tất cả bạn bè xem"], correct: 0, advice: "Chính xác tuyệt đối!" }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 3. Tổ chức lưu trữ, tìm kiếm và trao đổi thông tin",
+                    lessons: [
+                        { id: "4_4", title: "Bài 4. Tìm kiếm thông tin trên Internet", questions: [
+                            { q: "Từ khoá trong tìm kiếm thông tin trên Internet là gì?", options: ["Từ hoặc cụm từ thể hiện nội dung thông tin muốn tìm kiếm", "Địa chỉ nhà của em", "Mật khẩu máy tính", "Tên của giáo viên"], correct: 0, advice: "Cô Khánh Vân hướng dẫn: Chọn từ khoá ngắn gọn, chính xác giúp tìm thông tin nhanh nhất." },
+                            { q: "Địa chỉ nào sau đây là của một máy tìm kiếm phổ biến trên Internet?", options: ["google.com", "word.com", "paint.com", "notepad.com"], correct: 0, advice: "Chính xác! Google.com, bing.com là các máy tìm kiếm hàng đầu." },
+                            { q: "Thứ tự đúng các bước tìm kiếm thông tin trên Internet là gì?", options: ["Xác định từ khoá -> Mở máy tìm kiếm -> Gõ từ khoá nhấn Enter -> Nháy chọn siêu liên kết", "Nháy đại vào màn hình không cần từ khoá", "Rút dây mạng rồi tìm kiếm", "Tắt máy tính trước khi tìm"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Nếu muốn tìm thông tin về 'Bảo tàng Dân tộc học Việt Nam', từ khoá nào phù hợp nhất?", options: ["Bảo tàng Dân tộc học Việt Nam", "Bảo tàng", "Cây xanh", "Đồ chơi"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Sau khi gõ từ khoá và nhấn Enter, trang web tìm kiếm hiển thị danh sách gì?", options: ["Danh sách các siêu liên kết phù hợp với từ khoá", "Chỉ hiển thị một bức tranh", "Tự động tắt máy", "Trò chơi điện tử"], correct: 0, advice: "Tuyệt vời!" }
+                        ]},
+                        { id: "4_5", title: "Bài 5. Thao tác với tệp và thư mục", questions: [
+                            { q: "Khi di chuyển (Move) một thư mục đến vị trí mới, điều gì xảy ra?", options: ["Thư mục được chuyển đến vị trí mới và không còn tồn tại ở vị trí cũ", "Thư mục nhân đôi ở cả hai nơi", "Thư mục bị xóa vĩnh viễn", "Máy tính bị treo"], correct: 0, advice: "Cô Khánh Vân phân biệt: Di chuyển (Move) làm mất ở chỗ cũ, còn Sao chép (Copy) giữ lại ở cả hai nơi." },
+                            { q: "Thao tác sao chép (Copy) và dán (Paste) một tệp mang lại kết quả thế nào?", options: ["Tệp xuất hiện ở cả vị trí cũ và vị trí mới", "Tệp biến mất hoàn toàn", "Tên tệp tự đổi thành số", "Máy tính phát ra tiếng kêu"], correct: 0, advice: "Chính xác!" },
+                            { q: "Hành động nào là thao tác KHÔNG ĐÚNG và gây nguy hiểm cho dữ liệu máy tính?", options: ["Tự ý xóa, đổi tên các tệp hệ thống trong ổ đĩa C (thư mục Windows)", "Tạo thư mục tên của mình", "Sao chép bài tập vào USB", "Đổi tên tệp do mình tạo"], correct: 0, advice: "Cô Khánh Vân lưu ý: Chỉ thao tác với tệp do mình tạo ra, không can thiệp tệp hệ thống." },
+                            { q: "Thao tác đổi tên tệp (Rename) được thực hiện tương tự như thao tác nào đã học ở lớp 3?", options: ["Đổi tên thư mục", "Xóa tệp", "Tắt máy", "In văn bản"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Thao tác nhầm lẫn như xóa nhầm tệp hệ thống có thể dẫn đến hậu quả gì?", options: ["Lỗi chương trình, treo máy tính hoặc mất thông tin", "Máy tính chạy nhanh hơn", "Được thưởng điểm 10", "Không có hậu quả gì"], correct: 0, advice: "Chính xác tuyệt đối!" }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 4. Đạo đức, pháp luật và văn hoá trong môi trường số",
+                    lessons: [
+                        { id: "4_6", title: "Bài 6. Sử dụng phần mềm khi được phép", questions: [
+                            { q: "Phần mềm miễn phí là phần mềm như thế nào?", options: ["Được tác giả cho phép sử dụng mà không phải trả phí", "Phần mềm bị hỏng không dùng được", "Phần mềm đánh cắp dữ liệu", "Phần mềm giấu kín"], correct: 0, advice: "Cô Khánh Vân giới thiệu: Phần mềm miễn phí ví dụ như Kiran's Typing Tutor, Unikey, Scratch." },
+                            { q: "Phần mềm không miễn phí (có phí) yêu cầu người dùng điều gì?", options: ["Phải trả phí bản quyền cho nhà sản xuất mới được sử dụng đầy đủ", "Phải tự lập trình lại từ đầu", "Phải mang máy tính ra cửa hàng", "Không cần làm gì cả"], correct: 0, advice: "Chính xác!" },
+                            { q: "Tại sao chúng ta chỉ nên sử dụng phần mềm có bản quyền?", options: ["Để giữ an toàn thông tin, tránh vi phạm pháp luật và được hỗ trợ từ nhà sản xuất", "Để tốn nhiều tiền hơn", "Vì phần mềm bản quyền có nhiều quảng cáo", "Để máy tính mau hỏng"], correct: 0, advice: "Đúng vậy! Tôn trọng bản quyền là biểu hiện của văn hóa số." },
+                            { q: "Hành vi tải và sử dụng phần mềm có phí bị bẻ khóa trái phép (crack) là:", options: ["Việc làm vi phạm pháp luật và không an toàn cho máy tính", "Việc làm được khuyến khích", "Hành động anh hùng", "Quyền lợi mặc định"], correct: 0, advice: "Cô Khánh Vân nhấn mạnh: Phần mềm lậu tiềm ẩn nguy cơ nhiễm virus rất cao." },
+                            { q: "Mỗi phần mềm máy tính được tạo ra là sản phẩm của ai?", options: ["Trí tuệ và tài sản của tác giả (cá nhân hoặc tổ chức)", "Tự nhiên sinh ra", "Do máy tính tự sinh", "Do thời tiết tạo ra"], correct: 0, advice: "Chính xác tuyệt đối!" }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 5. Ứng dụng tin học",
+                    lessons: [
+                        { id: "4_7", title: "Bài 7. Tạo bài trình chiếu", questions: [
+                            { q: "Để gõ được chữ tiếng Việt có dấu trên máy tính, phần mềm nào thường được sử dụng ở Việt Nam?", options: ["Unikey (hoặc EVKey, Vietkey)", "Microsoft Word", "Paint", "Calculator"], correct: 0, advice: "Cô Khánh Vân hướng dẫn: Khởi động Unikey và chọn kiểu gõ Telex hoặc VNI để gõ tiếng Việt." },
+                            { q: "Trong kiểu gõ Telex, để có chữ 'ư', em gõ phím nào?", options: ["uw", "w", "v", "z"], correct: 0, advice: "Chính xác! aw=ă, oo=ô, ee=ê, ow=ơ, uw=ư." },
+                            { q: "Khi tạo bài trình chiếu giới thiệu cảnh đẹp quê hương, Trang 1 thường trình bày gì?", options: ["Tiêu đề bài, họ tên học sinh và lớp", "Lời bài hát", "Toàn bộ hình ảnh", "Lời cảm ơn cuối cùng"], correct: 0, advice: "Đúng vậy! Trang đầu tiên là trang bìa giới thiệu." },
+                            { q: "Thao tác lưu tệp trình chiếu vào đúng thư mục được thực hiện qua lệnh nào?", options: ["File -> Save (hoặc Save As)", "File -> Print", "Edit -> Cut", "View -> Zoom"], correct: 0, advice: "Chính xác!" },
+                            { q: "Sau khi lưu bài trình chiếu xong, để thoát khỏi phần mềm PowerPoint, em nháy chuột vào nút nào ở góc trên bên phải?", options: ["Nút X (Close)", "Nút trừ (-)", "Nút ô vuông", "Nút mũi tên"], correct: 0, advice: "Tuyệt vời!" }
+                        ]},
+                        { id: "4_8", title: "Bài 8. Định dạng văn bản trên trang chiếu", questions: [
+                            { q: "Để trang chiếu rõ ràng và đẹp hơn, em có thể thay đổi những định dạng gì cho văn bản?", options: ["Phông chữ, kiểu chữ, cỡ chữ và màu chữ", "Chỉ đổi màu màn hình máy tính", "Chỉ đổi bàn phím", "Không thể thay đổi gì"], correct: 0, advice: "Cô Khánh Vân hướng dẫn: Sử dụng nhóm lệnh Font trong dải lệnh Home để định dạng." },
+                            { q: "Trước khi thực hiện định dạng cho một đoạn văn bản trên trang chiếu, bước bắt buộc đầu tiên là gì?", options: ["Chọn (bôi đen) phần văn bản cần định dạng", "Xóa văn bản đó đi", "Tắt máy tính", "Mở thùng rác"], correct: 0, advice: "Chính xác! Máy tính cần biết em muốn định dạng chữ nào." },
+                            { q: "Nút lệnh 'B' (Bold) trong nhóm Font có chức năng định dạng kiểu chữ gì?", options: ["Kiểu chữ đậm", "Kiểu chữ nghiêng", "Kiểu chữ gạch chân", "Cỡ chữ lớn"], correct: 0, advice: "Đúng vậy! B = Bold (đậm), I = Italic (nghiêng), U = Underline (gạch chân)." },
+                            { q: "Công cụ gạch đầu dòng (Bullets) trên trang chiếu nằm ở nhóm lệnh nào của dải Home?", options: ["Paragraph", "Font", "Editing", "Clipboard"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Để mở một tệp trình chiếu đã lưu từ trước trên máy tính, em chọn lệnh nào trong bảng chọn File?", options: ["Open", "Save", "New", "Exit"], correct: 0, advice: "Tuyệt vời!" }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 6. Giải quyết vấn đề với sự trợ giúp của máy tính",
+                    lessons: [
+                        { id: "4_9", title: "Bài 13. Chơi với máy tính", questions: [
+                            { q: "Ở lớp 4, lần đầu tiên các em được làm quen với loại ngôn ngữ lập trình nào?", options: ["Ngôn ngữ lập trình trực quan (như Scratch)", "Ngôn ngữ máy phức tạp", "Chỉ viết tay trên giấy", "Không học lập trình"], correct: 0, advice: "Cô Khánh Vân giới thiệu: Lập trình trực quan giúp em kéo thả các khối lệnh để tạo chương trình thú vị." },
+                            { q: "Trò chơi máy tính được thiết kế cho thiếu nhi giúp học sinh rèn luyện điều gì?", options: ["Tư duy nhanh nhạy, phản xạ tốt và giải trí lành mạnh", "Thói quen bạo lực", "Làm hỏng bàn phím", "Mất thời gian học tập"], correct: 0, advice: "Chính xác!" },
+                            { q: "Khi điều khiển nhân vật vượt qua mê cung trong trò chơi lập trình, em sử dụng các phím gì?", options: ["Các phím mũi tên (lên, xuống, trái, phải)", "Phím nguồn", "Phím Caps Lock", "Phím Delete"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Chương trình máy tính thực chất là gì?", options: ["Tập hợp các câu lệnh hướng dẫn máy tính thực hiện các công việc theo ý muốn", "Bức tranh vẽ tay", "Cuốn sách giáo khoa", "Bản nhạc không lời"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Em có thể tự tạo ra trò chơi máy tính của riêng mình không nếu chăm chỉ học lập trình trực quan?", options: ["Có, em hoàn toàn có thể tự viết trò chơi theo ý tưởng của mình", "Không bao giờ được", "Chỉ có người lớn làm được", "Máy tính tự làm hết"], correct: 0, advice: "Tuyệt vời! Chào mừng các em đến với thế giới lập trình sáng tạo." }
+                        ]}
+                    ]
+                }
+            ]
+        },
+        5: {
+            title: "Tin Học Lớp 5 (Kết nối tri thức với cuộc sống)",
+            chapters: [
+                {
+                    name: "Chủ đề 1. Máy tính và em",
+                    lessons: [
+                        { id: "5_1", title: "Bài 1. Em có thể làm gì với máy tính?", questions: [
+                            { q: "Máy tính ở lớp 5 có thể hỗ trợ học sinh thực hiện những hoạt động nào?", options: ["Học tập, giải trí, tìm kiếm, trao đổi thông tin, hợp tác và tạo sản phẩm số", "Chỉ để chơi game một mình", "Chỉ để quét văn bản giấy", "Không làm được gì nhiều"], correct: 0, advice: "Cô Khánh Vân tổng kết: Sử dụng máy tính thành thạo giúp em mở rộng vô số kỹ năng trong thời đại số." },
+                            { q: "Phần mềm soạn thảo văn bản giúp em tạo ra sản phẩm số gì?", options: ["Viết truyện, làm thơ, soạn thảo bài báo cáo", "Tạo ra video hoạt hình 3D", "Lập trình robot hành động", "Chỉnh sửa bản nhạc"], correct: 0, advice: "Chính xác!" },
+                            { q: "Các phần mềm như Zoom, Google Meet, Microsoft Teams hỗ trợ học sinh điều gì?", options: ["Hợp tác, tương tác, thảo luận và học tập trực tuyến với bạn bè, thầy cô", "Chỉ dùng để chơi trò chơi mạng", "Khóa máy tính từ xa", "Xóa dữ liệu ổ cứng"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Trò chơi Mê cung (Scratch) trong bài thực hành lớp 5 được điều khiển bằng cách nào?", options: ["Sử dụng các phím mũi tên trên bàn phím để điều khiển nhân vật", "Dùng micro hét lớn", "Lắc mạnh màn hình", "Rút nguồn điện"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Phát biểu nào sau đây là ĐÚNG về việc sử dụng máy tính thành thạo?", options: ["Sử dụng thành thạo sẽ giúp em làm được nhiều việc hữu ích hơn trong học tập và cuộc sống", "Làm học sinh quên hết kiến thức sách vở", "Không có ích lợi gì", "Làm máy tính nhanh hỏng"], correct: 0, advice: "Tuyệt vời!" }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 2. Mạng máy tính và Internet",
+                    lessons: [
+                        { id: "5_2", title: "Bài 2. Tìm kiếm thông tin trên website", questions: [
+                            { q: "Khi cần tìm thông tin về cuộc thi 'Ngày hội Trạng Nguyên nhỏ tuổi' trên website thieunien.vn, thao tác chuẩn xác nhất của nhóm An, Minh, Khoa là gì?", options: ["Nháy chuột vào nút tìm kiếm hình kính lúp, nhập từ khoá 'Ngày hội Trạng Nguyên nhỏ tuổi' rồi nháy nút Tìm kiếm.", "Ngồi lướt từng trang bài viết từ năm trước đến nay.", "Gửi tin nhắn lên mạng xã hội nhờ người khác tìm giúp.", "Bật phần mềm luyện gõ bàn phím."], correct: 0, exp: "SGK Tin học 5 (Bài 2, trang 9-11) hướng dẫn 3 bước: Nháy nút kính lúp -> Nhập từ khoá 'Ngày hội Trạng Nguyên nhỏ tuổi' -> Nháy Tìm kiếm để nhận bài viết chi tiết.", advice: "Rất thông minh! Sử dụng công cụ kính lúp tìm kiếm nội bộ trên trang web giúp em tra cứu tài liệu nhanh gọn và chính xác." },
+                            { q: "Nút về trang chủ (homepage) trên website thường có biểu tượng hình gì?", options: ["Hình ngôi nhà", "Hình chiếc xe hơi", "Hình con mèo", "Hình phong thư"], correct: 0, advice: "Chính xác! Biểu tượng ngôi nhà giúp em quay về trang chính nhanh chóng." },
+                            { q: "Công cụ tìm kiếm trên website thường có biểu tượng hình gì?", options: ["Hình kính lúp", "Hình cái kéo", "Hình chiếc chìa khóa", "Hình cái xô"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Để chia sẻ tệp dữ liệu làm bài tập nhóm cho các bạn trong lớp, em có thể dùng cách nào?", options: ["Gửi qua thư điện tử (email), mạng xã hội hoặc dùng thiết bị lưu trữ di động (USB)", "Vứt tệp vào sọt rác", "In ra giấy rồi xé nhỏ", "Kêu to tên tệp"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Khi ngắt kết nối ổ đĩa USB khỏi máy tính, em cần thực hiện thao tác gì để đảm bảo an toàn dữ liệu?", options: ["Chọn Eject (Safe To Remove Hardware) trước khi rút USB ra khỏi cổng", "Giật mạnh dây USB thật nhanh", "Tắt nguồn toàn bộ tòa nhà trường học", "Đổ nước vào cổng USB"], correct: 0, advice: "Tuyệt vời!" }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 3. Tổ chức lưu trữ, tìm kiếm và trao đổi thông tin",
+                    lessons: [
+                        { id: "5_3", title: "Bài 3. Tìm kiếm thông tin trong giải quyết vấn đề", questions: [
+                            { q: "Vai trò của việc thu thập và tìm kiếm thông tin trong giải quyết vấn đề là gì?", options: ["Rất cần thiết và quan trọng; có đầy đủ thông tin sẽ giúp em giải quyết vấn đề tốt hơn", "Không có vai trò gì, cứ làm bừa là được", "Làm phức tạp hóa vấn đề", "Chỉ làm mất thời gian"], correct: 0, advice: "Cô Khánh Vân nhấn mạnh: 'Thiếu thông tin sẽ khiến em gặp khó khăn trong giải quyết vấn đề'." },
+                            { q: "Trước khi đi du lịch hoặc tham quan dã ngoại cùng lớp, việc tra cứu dự báo thời tiết giúp em điều gì?", options: ["Chuẩn bị trang phục và đồ dùng mang theo phù hợp với thời tiết nơi đến", "Biết trước ngày sinh nhật của bạn", "Tính tiền mua vé xe", "Không có tác dụng gì"], correct: 0, advice: "Chính xác! Như An chuẩn bị đồ bơi vì Nha Trang nắng nóng, còn Khoa mang đồ ấm vì Đà Lạt lạnh về đêm (SGK trang 15)." },
+                            { q: "Khi làm việc nhóm để giải quyết một nhiệm vụ lớn, cách phân công hợp lý nhất là gì?", options: ["Chia nhỏ công việc và phân công dựa trên điểm mạnh của từng thành viên", "Một bạn giỏi làm hết, các bạn khác đi chơi", "Mỗi bạn làm một việc ngẫu nhiên không bàn bạc", "Không làm gì cả đợi cô giáo nhắc"], correct: 0, advice: "Đúng vậy! Tinh thần hợp tác nhóm hiệu quả mang lại thành công chung." },
+                            { q: "Nguồn thông tin để giải quyết vấn đề có thể được tìm thấy ở đâu?", options: ["Internet, ti vi, sách báo, từ mọi người xung quanh", "Chỉ tìm được trong giấc mơ", "Chỉ trên mặt bàn học", "Trong thùng rác"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Phát biểu nào sau đây là SAI về việc giải quyết vấn đề?", options: ["Thông tin không có vai trò gì trong giải quyết vấn đề", "Để giải quyết vấn đề cần đưa ra quyết định", "Để có quyết định cần có thông tin", "Thu thập thông tin liên quan là rất quan trọng"], correct: 0, advice: "Chuẩn xác!" }
+                        ]},
+                        { id: "5_4", title: "Bài 4. Cây thư mục", questions: [
+                            { q: "Để tạo được một cấu trúc cây thư mục lưu trữ trong máy tính hợp lý, em cần làm gì?", options: ["Đặt tên thống nhất, rõ ràng và phân loại tệp theo tiêu chí (thời gian, nội dung, loại tệp, chủ sở hữu)", "Vứt mọi tệp vào một thư mục chung hỗn độn", "Đặt tên tất cả các tệp là 'abc.xyz'", "Không cần tạo thư mục"], correct: 0, advice: "Cô Khánh Vân hướng dẫn quản lý dữ liệu: Cây thư mục khoa học giúp tìm kiếm nhanh chóng, tiết kiệm thời gian." },
+                            { q: "Công cụ tìm kiếm tệp và thư mục trên hệ điều hành Windows nằm ở đâu trong cửa sổ This PC / File Explorer?", options: ["Ở góc trên bên phía phải cửa sổ", "Ở dưới đáy màn hình máy tính", "Trong ổ cắm điện", "Trên loa máy tính"], correct: 0, advice: "Chính xác! Ô 'Search This PC' giúp tìm ngay tệp khi quên thư mục chứa." },
+                            { q: "Khi em chỉ nhớ một phần tên tệp, công cụ tìm kiếm trên máy tính có hỗ trợ tìm không?", options: ["Có, rất hữu ích khi chỉ nhớ một phần tên hoặc từ khóa", "Không bao giờ tìm được", "Máy tính sẽ tự động xóa tệp đó", "Bắt buộc phải nhớ chính xác từng ký tự"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Thao tác 'Open file location' sau khi tìm kiếm tệp có chức năng gì?", options: ["Mở thư mục chứa tệp đó trên máy tính", "Xóa tệp ngay lập tức", "Đổi tên tệp thành chữ hoa", "Gửi tệp qua máy in"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Thường xuyên dọn dẹp và sắp xếp lại các thư mục, tệp trong máy tính giúp điều gì?", options: ["Dữ liệu ngăn nắp, dễ tìm kiếm và máy tính hoạt động hiệu quả hơn", "Làm tốn bộ nhớ hơn", "Làm máy tính bị nhiễm virus", "Không có tác dụng gì"], correct: 0, advice: "Tuyệt vời!" }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 4. Đạo đức, pháp luật và văn hoá trong môi trường số",
+                    lessons: [
+                        { id: "5_5", title: "Bài 5. Bản quyền nội dung thông tin", questions: [
+                            { q: "Bản quyền nội dung thông tin là gì?", options: ["Là quyền của tác giả cho phép hoặc không cho phép người khác sử dụng nội dung thông tin của mình", "Là quyền được lấy bài của người khác nhận làm của mình", "Là quyền xóa bỏ mọi tài liệu trên mạng", "Là quyền bán máy tính cũ"], correct: 0, advice: "Cô Khánh Vân nhấn mạnh: Tôn trọng bản quyền là chuẩn mực đạo đức quan trọng trong môi trường số." },
+                            { q: "Khi sử dụng bài viết, hình ảnh của người khác vào bài trình chiếu của mình, em cần làm gì?", options: ["Được sự đồng ý của tác giả và ghi rõ nguồn thông tin (hoặc tên tác giả)", "Giấu kín nguồn gốc để mọi người tưởng mình tự sáng tác", "Xóa tên tác giả gốc đi", "Cắt ghép tùy ý"], correct: 0, advice: "Chính xác! Ghi rõ nguồn là thể hiện sự tôn trọng trí tuệ." },
+                            { q: "Hành vi đọc lén nhật kí hoặc sao chép tệp bài làm của bạn khi chưa được phép là hành vi:", options: ["Sai trái, thiếu tôn trọng tính riêng tư và vi phạm đạo đức học tập", "Được biểu dương trước lớp", "Hành động thông minh", "Quyền lợi của học sinh"], correct: 0, advice: "Cô Khánh Vân lưu ý: Cần thể hiện thái độ không đồng tình với các hành vi gian dối này." },
+                            { q: "Thông tin cá nhân mang tính riêng tư như số điện thoại, địa chỉ nhà, nhật kí:", options: ["Chỉ cá nhân người đó mới có quyền quyết định cho người khác biết hay không", "Công khai lên bảng tin toàn trường", "Bán cho người lạ", "In ra phát cho mọi người"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Ký hiệu bản quyền © kèm tên nhà sản xuất hoặc tác giả trên sản phẩm có ý nghĩa gì?", options: ["Khẳng định quyền sở hữu hợp pháp và bảo vệ quyền tác giả đối với nội dung thông tin", "Báo hiệu sản phẩm sắp hỏng", "Là hình trang trí cho đẹp", "Cho phép ai lấy cũng được"], correct: 0, advice: "Tuyệt vời!" }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 5. Ứng dụng tin học",
+                    lessons: [
+                        { id: "5_6", title: "Bài 6. Định dạng kí tự và bố trí hình ảnh trong văn bản", questions: [
+                            { q: "Trong phần mềm soạn thảo văn bản Word, việc định dạng kí tự (phông, kiểu, cỡ, màu chữ) giúp ích gì?", options: ["Trình bày văn bản đẹp hơn, nổi bật các ý chính, dễ đọc và dễ ghi nhớ", "Làm văn bản dài thêm 100 trang", "Làm tốn mực máy in", "Không có tác dụng gì"], correct: 0, advice: "Cô Khánh Vân hướng dẫn: Sử dụng nhóm lệnh Font để làm nổi bật tiêu đề và đầu mục." },
+                            { q: "Sau khi chèn hình ảnh vào văn bản, em có thể thay đổi cách bố trí (Text Wrapping) để làm gì?", options: ["Định vị hình ảnh nằm hợp lý (ví dụ dàn xung quanh chữ, bên phải chữ) giúp văn bản đẹp mắt", "Làm hình ảnh biến mất", "Biến văn bản thành hình tròn", "Làm máy tính đứng hình"], correct: 0, advice: "Chính xác!" },
+                            { q: "Thao tác chọn kiểu chữ 'Đậm' (Bold) được thực hiện bằng cách nháy vào nút lệnh nào?", options: ["Nút chữ B", "Nút chữ I", "Nút chữ U", "Nút chữ A"], correct: 0, advice: "Đúng vậy! B = Bold, I = Italic, U = Underline." },
+                            { q: "Để đổi màu cho chữ đã chọn, em sử dụng nút lệnh nào trong nhóm Font?", options: ["Nút lệnh Font Color (chữ A có gạch đỏ bên dưới)", "Nút lệnh Highlight", "Nút lệnh Cut", "Nút lệnh Copy"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Góp ý nào sau đây là hợp lý khi trình bày một tài liệu hướng dẫn (ví dụ: công thức làm kem)?", options: ["Tiêu đề nổi bật, trình bày rõ ràng, không lỗi chính tả và hình ảnh minh họa hấp dẫn", "Chữ nhỏ li ti không đọc được", "Trộn lẫn tất cả các dòng vào nhau", "Không có tiêu đề"], correct: 0, advice: "Tuyệt vời!" }
+                        ]},
+                        { id: "5_6b", title: "Bài 7. Thực hành soạn thảo văn bản", questions: [
+ { q: "Khi gõ nhầm hoặc gõ sai một đoạn văn bản, em dùng phím nào để xoá?", options: ["Phím Delete hoặc Backspace", "Phím Caps Lock", "Phím Tab", "Phím Esc"], correct: 0, advice: "Khi gõ nhầm hoặc sai, em dùng phím Delete hoặc Backspace để xoá rồi gõ lại." },
+ { q: "Để không phải gõ lại nhiều lần những phần văn bản giống nhau (như hai khổ thơ lặp lại), em nên làm gì?", options: ["Sao chép phần văn bản giống nhau rồi dán vào vị trí cần thiết", "Gõ lại từng chữ cho chắc chắn", "Xoá hết văn bản rồi làm lại", "Chèn thêm hình ảnh"], correct: 0, advice: "Thực hiện gõ và sao chép những phần văn bản giống nhau giúp em soạn thảo nhanh hơn." },
+ { q: "Để gõ được chữ hoa trong khi soạn thảo văn bản, em làm thế nào?", options: ["Nhấn giữ phím Shift và gõ phím chữ", "Nhấn phím Enter rồi gõ chữ", "Nhấn phím Backspace liên tục", "Nhấn phím Delete rồi gõ chữ"], correct: 0, advice: "Để gõ chữ hoa em nhấn giữ phím Shift và gõ phím chữ." },
+ { q: "Sau khi chèn hình ảnh minh hoạ vào văn bản bài hát, em cần gõ thêm thông tin gì ở cuối văn bản?", options: ["Nguồn của hình ảnh", "Số điện thoại của em", "Mật khẩu máy tính", "Tên bạn ngồi cạnh"], correct: 0, advice: "Khi dùng hình ảnh của người khác, em cần ghi rõ nguồn hình ảnh, như bài học Bản quyền nội dung thông tin." },
+ { q: "Muốn chuyển xuống dòng mới để gõ thêm lời hát lần 2 khi con trỏ đang ở cuối câu, em nhấn phím nào?", options: ["Phím Enter", "Phím Shift", "Phím Delete", "Phím Ctrl"], correct: 0, advice: "Đặt con trỏ soạn thảo ở cuối câu rồi nhấn phím Enter để xuống dòng, sau đó gõ tiếp nội dung." }
+ ]},
+ { id: "5_7", title: "Bài 8A. Làm quen với phần mềm đồ hoạ (Paint)", questions: [
+                            { q: "Phần mềm đồ hoạ Microsoft Paint cung cấp những công cụ chính nào?", options: ["Công cụ chọn, vẽ hình (oval, chữ nhật, đường thẳng), viết chữ, tô màu và tẩy", "Chỉ dùng để soạn thảo văn bản hành chính", "Chỉ dùng để nghe gọi điện thoại", "Chỉ tính toán số học"], correct: 0, advice: "Cô Khánh Vân giới thiệu: Phần mềm Paint giúp em vẽ tranh, thiết kế thiệp chúc mừng sinh nhật rất sinh động." },
+                            { q: "Trong hộp màu của Paint, 'Màu 1' (Color 1) và 'Màu 2' (Color 2) được dùng làm gì?", options: ["Màu 1 dùng cho bút vẽ/đường viền; Màu 2 dùng cho tẩy hoặc màu nền", "Cả hai màu đều dùng để ăn", "Không có chức năng gì", "Dùng để tắt mở phần mềm"], correct: 0, advice: "Chính xác!" },
+                            { q: "Công cụ nào trong Paint giúp em nhân bản một hình vẽ thành nhiều hình giống hệt (ví dụ chùm bóng bay)?", options: ["Công cụ chọn Select kết hợp lệnh Copy và Paste", "Công cụ tẩy Eraser", "Công cụ tô màu Fill", "Công cụ viết chữ A"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Tính năng 'Transparent selection' khi bật lên trong công cụ Select có tác dụng gì?", options: ["Làm cho phần nền trắng quanh hình chọn trở nên trong suốt khi di chuyển", "Làm biến mất hình vẽ", "Biến hình thành màu đen", "Phát ra âm thanh"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Lệnh 'Flip horizontal' trong nhóm Rotate dùng để làm gì cho hình vẽ?", options: ["Lật đối xứng hình theo chiều ngang", "Xoay ngược đầu xuống dưới", "Thu nhỏ hình 10 lần", "Xóa sổ hình vẽ"], correct: 0, advice: "Tuyệt vời!" }
+                        ]}
+                    ]
+                },
+                {
+                    name: "Chủ đề 6. Giải quyết vấn đề với sự trợ giúp của máy tính",
+                    lessons: [
+                        { id: "5_8", title: "Bài 10 & 11. Cấu trúc tuần tự và cấu trúc lặp trong lập trình Scratch", questions: [
+                            { q: "Cấu trúc tuần tự trong chương trình máy tính (Scratch) có nghĩa là gì?", options: ["Các câu lệnh được thực hiện lần lượt theo đúng thứ tự từ trên xuống dưới", "Các câu lệnh chạy ngẫu nhiên hỗn loạn", "Chỉ chạy câu lệnh cuối cùng", "Không câu lệnh nào chạy cả"], correct: 0, advice: "Cô Khánh Vân giải thích về lập trình Scratch: Máy tính đọc và thực hiện tuần tự từng khối lệnh một cách chính xác." },
+                            { q: "Trong Scratch, cấu trúc lặp (Repeat / Forever) dùng để làm gì?", options: ["Giúp thực hiện lặp đi lặp lại một nhóm câu lệnh nhiều lần mà không phải kéo lắp lại thủ công", "Làm chương trình dừng hẳn", "Xóa toàn bộ nhân vật", "Làm đổi màu giao diện máy tính"], correct: 0, advice: "Chính xác! Lệnh lặp giúp tối ưu hóa chương trình rất nhiều." },
+                            { q: "Để điều khiển nhân vật mèo di chuyển 10 bước rồi đổi trang phục, các câu lệnh cần được lắp ráp theo cấu trúc nào?", options: ["Cấu trúc tuần tự", "Cấu trúc ngủ đông", "Cấu trúc ngắt quãng", "Không cần lắp lệnh"], correct: 0, advice: "Đúng vậy!" },
+                            { q: "Khi em muốn nhân vật di chuyển vòng tròn liên tục không dừng trong Scratch, khối lệnh nào phù hợp nhất?", options: ["Khối lệnh lặp vô hạn (Forever)", "Khối lệnh dừng lại tất cả", "Khối lệnh phát âm thanh", "Khối lệnh hỏi tên"], correct: 0, advice: "Chính xác tuyệt đối!" },
+                            { q: "Việc học lập trình trực quan ở lớp 5 giúp rèn luyện cho học sinh tư duy gì?", options: ["Tư duy giải quyết vấn đề, tính logic và sáng tạo sản phẩm số", "Tư duy hội họa cổ điển", "Tư duy âm nhạc giao hưởng", "Không rèn luyện gì"], correct: 0, advice: "Tuyệt vời! Chúc các em học sinh luôn đam mê và sáng tạo cùng môn Tin học!" }
+                        ]}
+                    ]
+                }
+            ]
+        }
+    };
+
+    const SGK_REFS = {"3_1": ["5|Khởi động & Hoạt động 1", "7|Mục 3 – Ba dạng thông tin thường gặp", "6|Mục 1 – Bảng Thông tin – Quyết định", "6|Mục 1 – Câu hỏi 1", "7|Mục 2 – Hộp kiến thức"], "3_2": ["10|Mục 1 – Hộp kiến thức (bộ não)", "9|Mục 1 – Hoạt động 1 & Hình 4", "10|Mục 1 – Câu hỏi 2 (thả diều)", "10-11|Mục 2 – Máy xử lí thông tin", "12|Luyện tập – câu 2 (bếp từ)"], "3_3": ["14|Mục 1 – Các bộ phận cơ bản", "14|Mục 1 – Thân máy & bộ xử lí", "15|Mục 2 – Màn hình cảm ứng", "16|Mục 3 – Bảng NÊN / KHÔNG NÊN", "17|Luyện tập – câu 3"], "3_4": ["19|Mục 1 – Tư thế ngồi đúng (Hình 19)", "19|Mục 1 – Kiến thức (nghỉ sau 30 phút)", "20|Mục 2 – Các thao tác cơ bản với chuột", "20-22|Mục 2 & Nhiệm vụ 3 (Hình 27)", "23|Nhiệm vụ 4 – Các bước tắt máy (Hình 29)"], "3_5": ["26|Mục 1 – Hình 32: hai phím có gờ", "26|Mục 1 – Hộp kiến thức", "25|Hoạt động 1 – Hình 31", "27-28|Mục 2 – Nhiệm vụ 2 (Kiran's Typing Tutor)", "26|Mục 1 – Hộp kiến thức (xem thêm Tin học 4, Bài 2, trang 11)"], "3_6": ["31|Mục 1 – Hộp kiến thức", "32|Mục 2 – Hộp kiến thức (kho thông tin khổng lồ)", "32-33|Mục 3 – Hoạt động 3", "33|Mục 3 – Kiến thức & Hộp kiến thức", "33|Mục 3 – Câu hỏi"], "3_7": ["35|Mục 1 – Hộp kiến thức", "35|Mục 1 – Hình 43 (tủ quần áo)", "36|Mục 2 – Hộp kiến thức", "36|Mục 2 – Câu hỏi 1 (giá sách)", "37|Vận dụng"], "3_8": ["38|Khởi động", "38-41|Cây thư mục (theo mục lục SGK)", "38-41|Tệp và thư mục (theo mục lục SGK)", "38-41|Tệp và thư mục (theo mục lục SGK)", "38|Mục 1 – Sơ đồ hình cây"], "3_9": ["42-45|Nội dung bài (theo mục lục SGK)", "42-45|Nội dung bài (theo mục lục SGK)", "42-45|Nội dung bài (theo mục lục SGK)", "42-45|Nội dung bài (theo mục lục SGK)", "42-45|Nội dung bài (theo mục lục SGK)"], "3_10": ["46-49|Nội dung bài (theo mục lục SGK)", "46-49|Nội dung bài (theo mục lục SGK)", "46-49|Nội dung bài (theo mục lục SGK)", "46-49|Nội dung bài (theo mục lục SGK)", "46-49|Nội dung bài (theo mục lục SGK)"], "3_11": ["50-54|Nội dung bài (theo mục lục SGK)", "50-54|Nội dung bài (theo mục lục SGK)", "50-54|Nội dung bài (theo mục lục SGK)", "50-54|Nội dung bài (theo mục lục SGK)", "50-54|Nội dung bài (theo mục lục SGK)"], "3_12": ["55-58|Nội dung bài (theo mục lục SGK)", "55-58|Nội dung bài (theo mục lục SGK)", "55-58|Nội dung bài (theo mục lục SGK)", "55-58|Nội dung bài (theo mục lục SGK)", "55-58|Nội dung bài (theo mục lục SGK)"], "3_13": ["59-62|Nội dung bài (theo mục lục SGK)", "59-62|Nội dung bài (theo mục lục SGK)", "59-62|Nội dung bài (theo mục lục SGK)", "59-62|Nội dung bài (theo mục lục SGK)", "59-62|Nội dung bài (theo mục lục SGK)"], "3_14": ["63-66|Nội dung bài (theo mục lục SGK)", "63-66|Nội dung bài (theo mục lục SGK)", "63-66|Nội dung bài (theo mục lục SGK)", "63-66|Nội dung bài (theo mục lục SGK)", "63-66|Nội dung bài (theo mục lục SGK)"], "3_15": ["67-70|Nội dung bài (theo mục lục SGK)", "67-70|Nội dung bài (theo mục lục SGK)", "67-70|Nội dung bài (theo mục lục SGK)", "67-70|Nội dung bài (theo mục lục SGK)", "67-70|Nội dung bài (theo mục lục SGK)"], "3_16": ["71-74|Nội dung bài (theo mục lục SGK)", "71-74|Nội dung bài (theo mục lục SGK)", "71-74|Nội dung bài (theo mục lục SGK)", "71-74|Nội dung bài (theo mục lục SGK)", "71-74|Nội dung bài (theo mục lục SGK)"], "4_1": ["5-6|Mục 1 – Phần cứng và phần mềm", "6|Mục 1 – Kiến thức & Hình ảnh hoạt động 1", "7|Mục 2 – Hộp kiến thức", "8|Mục 3 – Sử dụng máy tính đúng cách", "6|Mục 1 – Kiến thức (máy in, loa là phần cứng)"], "4_2": ["11|Mục 1a – Lợi ích gõ đúng cách (Hình 5)", "11|Mục 1b – Gõ phím hàng số (Hình 6)", "12|Nhiệm vụ 1 – Lưu ý Caps Lock / Shift", "31|Bài 7 – Bảng 1: gõ chữ Telex", "31|Bài 7 – Bảng 2: gõ dấu thanh Telex"], "4_3": ["15|Mục 1 – Hộp kiến thức", "15|Mục 1 – Siêu liên kết", "15|Mục 1 – Siêu văn bản", "15-16|Mục 2 – Tác hại khi vào web không phù hợp", "16|Mục 2 – Hộp kiến thức"], "4_4": ["19|Mục 1 – Kiến thức về từ khoá", "19|Mục 1 – Máy tìm kiếm", "19-20|Mục 1 – Các bước tìm kiếm", "19|Mục 1 – Câu hỏi 1", "19|Mục 1 – Các bước (bước 3)"], "4_5": ["22|Mục 1 – Di chuyển thư mục (Hình 17a)", "22-23|Mục 1 – Sao chép thư mục (Hình 17b)", "23|Mục 2 – Hoạt động 2", "26|Nhiệm vụ 2b – Đổi tên tệp (Hình 21)", "23-24|Mục 2 – Tác hại khi thao tác nhầm"], "4_6": ["27|Mục 1 – Phần mềm miễn phí", "27|Mục 1 – Bảng phần mềm", "29|Mục 2 – Lí do dùng phần mềm có bản quyền", "28|Mục 2 – Hoạt động 2", "28|Mục 2 – Kiến thức"], "4_7": ["30|Mục 1 – Gõ chữ tiếng Việt (Hình 25)", "31|Mục 1 – Bảng 1 gõ chữ Telex", "32|Mục 2 – Nhiệm vụ (Hình 26)", "32-33|Mục 2 – Lưu tệp (Hình 27)", "33|Mục 2 – Bước 2 thoát phần mềm"], "4_8": ["34-35|Mục 1 – Định dạng văn bản (Hình 29)", "37|Mục 2 – Bước 1 chọn văn bản (Hình 32)", "35|Mục 1 – Nút lệnh B, I, U", "34|Mục 1 – Bullets trong nhóm Paragraph", "36|Mục 2 – Bước 2 mở tệp (Hình 31)"], "4_9": ["59-62|Nội dung bài (theo mục lục SGK)", "59-62|Nội dung bài (theo mục lục SGK)", "59-62|Nội dung bài (theo mục lục SGK)", "59-62|Nội dung bài (theo mục lục SGK)", "59-62|Nội dung bài (theo mục lục SGK)"], "5_1": ["5|Mục 1 – Hộp kiến thức", "5-6|Mục 1 – Em có thể làm gì với máy tính", "6|Mục 1 – Hợp tác với các bạn", "6-7|Mục 2 – Nhiệm vụ: Mê cung (Hình 2)", "6|Mục 1 – Hộp kiến thức"], "5_2": ["9-11|Mục 1 & Nhiệm vụ 1 (Hình 7)", "8-9|Mục 1 – Hình 4 (nút về trang chủ)", "9|Mục 1 – Hình 5 (ô tìm kiếm)", "10|Mục 2 – Hoạt động 2 & Hộp kiến thức", "12-13|Nhiệm vụ 2 – Hình 13 (Eject USB)"], "5_3": ["15|Mục 1 – Hộp kiến thức", "15|Mục 1 – Ví dụ kì nghỉ hè (Hình 15, 16)", "16|Mục 2 – Hoạt động 2 & Hộp kiến thức", "17|Mục 3 – Nhiệm vụ 1 (nguồn thông tin)", "18|Luyện tập – câu 1"], "5_4": ["20|Mục 1 – Cách tạo cây thư mục hợp lí", "20-21|Mục 2 – Công cụ tìm kiếm (Hình 20)", "20-21|Mục 2 – Hộp kiến thức", "23|Nhiệm vụ 2 – Hình 23", "20|Mục 1 – Lời nhắc của bạn Khoa"], "5_5": ["25|Mục 1 – Hộp kiến thức", "26|Mục 2 – Hộp kiến thức", "27|Mục 3 – Hoạt động 2", "27|Mục 3 – Tính riêng tư", "26|Mục 2 – Hình 26 (ghi bản quyền ©)"], "5_6": ["29-30|Mục 1 – Hộp kiến thức", "30|Mục 1b – Bố trí hình ảnh (Hình 33)", "30|Mục 1a – Hình 31 (nút B, I, U)", "30|Mục 1a – Hình 31 (màu chữ)", "29|Khởi động – Hình 29, 30 (góp ý của An, Minh)"], "5_6b": ["34|Nhiệm vụ 1 – Lưu ý (Delete / Backspace)", "34|Nhiệm vụ 1 – Lưu ý (sao chép phần giống nhau)", "34|Nhiệm vụ 1 – Lưu ý (Shift gõ chữ hoa)", "34|Nhiệm vụ 1b – Chèn hình ảnh, ghi nguồn", "35|Nhiệm vụ 2 – Bước 1 (phím Enter)"], "5_7": ["37-38|Mục 2 – Các công cụ của phần mềm đồ hoạ", "39|Nhiệm vụ 1 – Hộp màu (Hình 43)", "41|Nhiệm vụ 3 – Copy & Paste (Hình 49)", "41|Nhiệm vụ 3 – Transparent selection", "41|Nhiệm vụ 3 – Bước 4 Flip horizontal"], "5_8": ["52-58|Nội dung bài (theo mục lục SGK)", "52-58|Nội dung bài (theo mục lục SGK)", "52-58|Nội dung bài (theo mục lục SGK)", "52-58|Nội dung bài (theo mục lục SGK)", "52-58|Nội dung bài (theo mục lục SGK)"]};
+    Object.values(curriculumData).forEach(g=>g.chapters.forEach(c=>c.lessons.forEach(l=>{(SGK_REFS[l.id]||[]).forEach((r,i)=>{if(l.questions[i])l.questions[i].ref=r;});})));
+
+    let currentUser = { name: "", studentClass: "", grade: 3 };
+    let currentLesson = null;
+    let currentQuestionIndex = 0;
+    let score = 0;
+    
+    // Khởi tạo bảng xếp hạng với dữ liệu lưu trữ cục bộ (localStorage) để lưu lại kết quả của học sinh từ các thiết bị và thời điểm khác nhau
+        // Khởi tạo bảng xếp hạng với dữ liệu lưu trữ cục bộ và đồng bộ đám mây thời gian thực
+    let leaderboard = [
+        { name: "Lê Trần Phúc Hưng (Lớp 5/2)", studentClass: "5/2", score: 25, grade: 5 },
+        { name: "Nguyễn Thị Bảo Trâm (Lớp 4/1)", studentClass: "4/1", score: 25, grade: 4 },
+        { name: "Trần Bảo Quân (Lớp 4/3)", studentClass: "4/3", score: 20, grade: 4 }
+    ];
+
+    // Cấu hình đồng bộ trực tuyến đám mây (Cloud Sync & Cross-Device Polling)
+    // Sử dụng kết hợp localStorage, BroadcastChannel (giữa các tab), sự kiện storage (giữa các cửa sổ), và Polling Cloud KV store công khai
+    const CLOUD_SYNC_ENDPOINT = "https://kvdb.io/EduAIPrimary2026_HoaLu_Leaderboard/data";
+
+    async function fetchOnlineLeaderboard() {
+        try {
+            // 1. Tải từ localStorage trước để hiển thị ngay lập tức không giật lag
+            const saved = localStorage.getItem('eduai_primary_leaderboard_online_v5');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    leaderboard = parsed;
+                    renderLeaderboard();
+                }
+            }
+
+            // 2. Tải từ Cloud KV Store công khai để đồng bộ kết quả giữa các thiết bị khác nhau
+            try {
+                const response = await fetch(CLOUD_SYNC_ENDPOINT);
+                if (response.ok) {
+                    const cloudData = await response.json();
+                    if (Array.isArray(cloudData) && cloudData.length > 0) {
+                        // Gộp dữ liệu cloud và local, loại bỏ trùng lặp dựa trên tên + lớp + điểm
+                        const mergedMap = new Map();
+                        [...leaderboard, ...cloudData].forEach(item => {
+                            const key = `${item.name}_${item.score}_${item.grade}`;
+                            mergedMap.set(key, item);
+                        });
+                        leaderboard = Array.from(mergedMap.values());
+                        leaderboard.sort((a, b) => b.score - a.score);
+                        if (leaderboard.length > 50) leaderboard = leaderboard.slice(0, 50);
+
+                        localStorage.setItem('eduai_primary_leaderboard_online_v5', JSON.stringify(leaderboard));
+                        renderLeaderboard();
+                    }
+                }
+            } catch (err) {
+                // Nếu mất mạng hoặc lỗi CORS, tiếp tục dùng localStorage
+            }
+        } catch(e) {}
+    }
+
+    async function syncAndPushScore(newEntry) {
+        try {
+            // Kiểm tra xem học sinh này đã có điểm trước đó chưa, nếu có thì cập nhật điểm cao nhất hoặc thêm mới
+            const existingIdx = leaderboard.findIndex(item => item.name.toLowerCase() === newEntry.name.toLowerCase());
+            if (existingIdx !== -1) {
+                if (newEntry.score > leaderboard[existingIdx].score) {
+                    leaderboard[existingIdx].score = newEntry.score;
+                    leaderboard[existingIdx].timestamp = newEntry.timestamp;
+                }
+            } else {
+                leaderboard.push(newEntry);
+            }
+
+            // Sắp xếp giảm dần theo điểm số
+            leaderboard.sort((a, b) => b.score - a.score);
+            if (leaderboard.length > 50) leaderboard = leaderboard.slice(0, 50);
+
+            // Lưu vào localStorage
+            localStorage.setItem('eduai_primary_leaderboard_online_v5', JSON.stringify(leaderboard));
+
+            // Phát tín hiệu đồng bộ qua BroadcastChannel cho các tab/cửa sổ khác trên cùng thiết bị
+            if (window.BroadcastChannel) {
+                const bc = new BroadcastChannel('eduai_leaderboard_sync_v5');
+                bc.postMessage(leaderboard);
+            }
+
+            // Đồng bộ lên Cloud KV Store để thiết bị khác có thể tải về xem kết quả
+            try {
+                await fetch(CLOUD_SYNC_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(leaderboard)
+                });
+            } catch(err) {}
+        } catch(e) {}
+        renderLeaderboard();
+    }
+
+    // Lắng nghe sự kiện storage từ các tab/cửa sổ khác trong cùng trình duyệt
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'eduai_primary_leaderboard_online_v5' && event.newValue) {
+            try {
+                const updated = JSON.parse(event.newValue);
+                if (Array.isArray(updated)) {
+                    leaderboard = updated;
+                    renderLeaderboard();
+                }
+            } catch(e) {}
+        }
+    });
+
+    // Lắng nghe BroadcastChannel
+    if (window.BroadcastChannel) {
+        const bc = new BroadcastChannel('eduai_leaderboard_sync_v5');
+        bc.onmessage = (event) => {
+            if (event.data && Array.isArray(event.data)) {
+                leaderboard = event.data;
+                localStorage.setItem('eduai_primary_leaderboard_online_v5', JSON.stringify(leaderboard));
+                renderLeaderboard();
+            }
+        };
+    }
+
+    // Tự động kiểm tra đồng bộ định kỳ mỗi 8 giây để học sinh dùng thiết bị khác thấy kết quả của nhau
+    setInterval(fetchOnlineLeaderboard, 8000);
+
+    // Gọi fetch khi trang vừa tải
+    fetchOnlineLeaderboard();
+
+    // Load teacher avatar into img tags
+    window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('teacher-avatar-img').src = avatarBase64;
+        document.getElementById('teacher-avatar-modal').src = avatarBase64;
+        renderLeaderboard();
+    });
+
+    function startApp(e) {
+        e.preventDefault();
+        const name = document.getElementById('student-name').value.trim();
+        const sClass = document.getElementById('student-class').value.trim();
+        if(!name || !sClass) return;
+
+        currentUser.name = name;
+        currentUser.studentClass = sClass;
+        
+        document.getElementById('user-greeting').innerText = `Xin chào học sinh: ${name} (Lớp ${sClass})`;
+        document.getElementById('student-badge').innerText = `Học sinh: ${name} (${sClass})`;
+
+        document.getElementById('screen-landing').classList.add('hidden');
+        document.getElementById('screen-grades').classList.remove('hidden');
+    }
+
+    function backToLanding() {
+        document.getElementById('screen-grades').classList.add('hidden');
+        document.getElementById('screen-landing').classList.remove('hidden');
+    }
+
+    function selectGrade(grade) {
+        currentUser.grade = grade;
+        const data = curriculumData[grade];
+        document.getElementById('curriculum-grade-label').innerText = `Khối Lớp ${grade} - Sách Kết nối tri thức`;
+        document.getElementById('curriculum-title').innerText = data.title;
+
+        renderCurriculum(data.chapters);
+
+        document.getElementById('screen-grades').classList.add('hidden');
+        document.getElementById('screen-curriculum').classList.remove('hidden');
+    }
+
+    function backToGrades() {
+        document.getElementById('screen-curriculum').classList.add('hidden');
+        document.getElementById('screen-grades').classList.remove('hidden');
+    }
+
+    function renderCurriculum(chapters) {
+        const container = document.getElementById('chapters-container');
+        container.innerHTML = '';
+
+        chapters.forEach((chap, cIdx) => {
+            const chapDiv = document.createElement('div');
+            chapDiv.className = 'border border-gray-200 rounded-2xl p-5 bg-slate-50/50';
+            
+            let lessonsHtml = '';
+            chap.lessons.forEach(lesson => {
+                lessonsHtml += `
+                    <div onclick="startQuiz('${lesson.id}')" class="bg-white hover:bg-blue-50 border border-gray-200/80 hover:border-blue-300 rounded-xl p-4 cursor-pointer transition flex items-center justify-between group shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs group-hover:bg-blue-600 group-hover:text-white transition">
+                                <i class="fa-solid fa-book"></i>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-800 group-hover:text-blue-700 transition">${lesson.title}</span>
+                        </div>
+                        <span class="text-xs font-bold text-blue-600 bg-blue-50 group-hover:bg-blue-600 group-hover:text-white px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+                            Làm bài tập <i class="fa-solid fa-arrow-right"></i>
+                        </span>
+                    </div>
+                `;
+            });
+
+            chapDiv.innerHTML = `
+                <h4 class="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-folder-open text-blue-600"></i> ${chap.name}
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    ${lessonsHtml}
+                </div>
+            `;
+            container.appendChild(chapDiv);
+        });
+    }
+
+    function findLessonById(id) {
+        const data = curriculumData[currentUser.grade];
+        for(let chap of data.chapters) {
+            for(let l of chap.lessons) {
+                if(l.id === id) return { lesson: l, topic: chap.name };
+            }
+        }
+        return null;
+    }
+
+    let answers = [];
+    let order = [], picked = -1, checked = false, timerId = null, elapsed = 0;
+    const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const fmt = n => String(Math.floor(n/60)).padStart(2,'0') + ':' + String(n%60).padStart(2,'0');
+    function stopTimer(){ if(timerId){ clearInterval(timerId); timerId=null; } }
+
+    function startQuiz(lessonId) {
+        const found = findLessonById(lessonId);
+        if(!found) return;
+        currentLesson = found.lesson;
+        currentQuestionIndex = 0;
+        score = 0; answers = [];
+        document.getElementById('quiz-lesson-title').innerText = found.topic + ' • ' + currentLesson.title;
+        document.getElementById('screen-curriculum').classList.add('hidden');
+        document.getElementById('screen-quiz').classList.remove('hidden');
+        document.body.classList.add('quiz-mode');
+        stopTimer(); elapsed = 0;
+        document.getElementById('quiz-timer').innerText = fmt(0);
+        timerId = setInterval(()=>{ elapsed++; document.getElementById('quiz-timer').innerText = fmt(elapsed); }, 1000);
+        loadQuestion();
+    }
+
+    function backToCurriculum() {
+        stopTimer();
+        document.body.classList.remove('quiz-mode');
+        document.getElementById('screen-quiz').classList.add('hidden');
+        document.getElementById('screen-result').classList.add('hidden');
+        document.getElementById('screen-curriculum').classList.remove('hidden');
+    }
+
+    function loadQuestion() {
+        const q = currentLesson.questions[currentQuestionIndex];
+        const total = currentLesson.questions.length;
+        const bai = (currentLesson.title.match(/^Bài ([^.]+)\./)||[,''])[1];
+        document.getElementById('quiz-progress').innerText = `Câu hỏi ${currentQuestionIndex + 1} / ${total}`;
+        document.getElementById('quiz-bar').style.width = ((currentQuestionIndex + 1) / total * 100) + '%';
+        document.getElementById('quiz-question').innerText = `[SGK Tin học ${currentUser.grade} - Bài ${bai}] ${q.q}`;
+
+        order = q.options.map((_, i) => i);
+        for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+        picked = -1; checked = false;
+
+        const box = document.getElementById('quiz-options');
+        box.innerHTML = '';
+        order.forEach((oi, pos) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt';
+            btn.innerText = `${String.fromCharCode(65 + pos)}. ${q.options[oi]}`;
+            btn.onclick = () => { if (checked) return; picked = pos; [...box.children].forEach(c => c.classList.remove('selected')); btn.classList.add('selected'); document.getElementById('check-btn').disabled = false; };
+            box.appendChild(btn);
+        });
+        document.getElementById('ai-assistant-box').classList.add('hidden');
+        document.getElementById('check-btn').disabled = true;
+        document.getElementById('check-btn').classList.remove('hidden');
+        document.getElementById('next-btn').classList.add('hidden');
+    }
+
+    function checkAnswer() {
+        if (picked < 0 || checked) return;
+        checked = true;
+        const q = currentLesson.questions[currentQuestionIndex];
+        const btns = [...document.getElementById('quiz-options').children];
+        const correctPos = order.indexOf(q.correct);
+        const ok = (picked === correctPos);
+        if (ok) score++;
+        btns.forEach(b => { b.disabled = true; b.classList.remove('selected'); });
+        btns[correctPos].classList.add('correct');
+        if (!ok) btns[picked].classList.add('wrong');
+
+        const L = String.fromCharCode(65 + correctPos);
+        const bai = (currentLesson.title.match(/^Bài ([^.]+)\./)||[,''])[1];
+        const [pg, sec] = (q.ref || '|').split('|');
+        const where = pg ? `SGK Tin học ${currentUser.grade} (Bài ${bai}, trang ${pg})` : `SGK Tin học ${currentUser.grade} (Bài ${bai})`;
+        const detail = q.exp ? esc(q.exp)
+            : `Đáp án đúng là <b>${L}</b>. ${esc(where)}${sec ? ' – ' + esc(sec) : ''}: «${esc(q.options[q.correct])}».`;
+        const lead = q.exp ? `Đáp án đúng là <b>${L}</b>. ` : '';
+        let tip = (q.advice || '').replace(/^Cô Khánh Vân[^:]*:\s*/, '').trim();
+        if (tip.length < 30) tip = ok ? 'Em đã nắm chắc kiến thức này, hãy tiếp tục phát huy nhé.' : 'Em hãy mở SGK đọc lại khung kiến thức của mục này rồi thử lại nhé.';
+        answers.push({ok, q:q.q, where, sec});
+        const verdict = ok
+            ? '<div class="font-bold text-emerald-600 mb-1">🌟 Rất xuất sắc! Câu trả lời hoàn toàn chính xác.</div>'
+            : `<div class="font-bold text-red-600 mb-1">⚠️ Chưa chính xác. Em đã chọn «${esc(q.options[order[picked]])}».</div>`;
+        const coach = ok ? `Rất thông minh! ${esc(tip)}` : `Đừng nản lòng nhé! ${esc(tip)} Em hãy đọc lại ${esc(pg ? 'trang ' + pg : 'bài học')} trong SGK rồi làm lại.`;
+
+        const aiBox = document.getElementById('ai-assistant-box');
+        aiBox.innerHTML = `
+            <div class="font-bold text-blue-800 text-sm mb-2"><i class="fa-solid fa-robot text-blue-600"></i> Trợ Lý Sư Phạm AI - Phân Tích Chẩn Đoán:</div>
+            ${verdict}
+            <div class="text-xs text-gray-700 leading-relaxed mb-3">${lead}${q.exp ? '' : ''}${q.exp ? detail : detail}</div>
+            <div class="ai-tip">💡 <b>Nhận xét từ Cô Khánh Vân:</b> ${coach}</div>`;
+        aiBox.classList.remove('hidden');
+
+        document.getElementById('check-btn').classList.add('hidden');
+        const nb = document.getElementById('next-btn');
+        nb.innerHTML = (currentQuestionIndex === currentLesson.questions.length - 1) ? 'Xem kết quả <i class="fa-solid fa-flag-checkered ml-1"></i>' : 'Câu tiếp theo <i class="fa-solid fa-arrow-right ml-1"></i>';
+        nb.classList.remove('hidden');
+        aiBox.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < currentLesson.questions.length) loadQuestion(); else showResult();
+    }
+
+    function renderReview() {
+        const total = answers.length, ok = answers.filter(a => a.ok).length, pct = Math.round(ok / total * 100);
+        const lv = pct === 100 ? ['Xuất sắc','🏅'] : pct >= 60 ? ['Khá tốt','👍'] : ['Cần ôn tập','💪'];
+        document.getElementById('result-stats').innerHTML =
+            `<div class="tile text-center"><div class="text-2xl font-extrabold text-emerald-600">${pct}%</div><div class="text-[11px] text-gray-500">Độ chính xác</div></div>
+             <div class="tile text-center"><div class="text-2xl font-extrabold text-orange-500">${fmt(elapsed)}</div><div class="text-[11px] text-gray-500">Thời gian làm bài</div></div>
+             <div class="tile text-center"><div class="text-2xl">${lv[1]}</div><div class="text-[11px] font-bold text-gray-700">${lv[0]}</div></div>`;
+        const wrong = answers.filter(a => !a.ok);
+        document.getElementById('result-review').innerHTML = wrong.length === 0
+            ? '<p>✅ Em nắm vững toàn bộ nội dung bài này. Gợi ý: chuyển sang bài tiếp theo hoặc giúp bạn cùng lớp ôn tập nhé!</p>'
+            : wrong.map(a => `<p>📖 <b>Ôn lại:</b> ${esc(a.where)}${a.sec ? ' – ' + esc(a.sec) : ''}<br><span class="text-gray-500">Câu: ${esc(a.q.length > 90 ? a.q.slice(0, 90) + '…' : a.q)}</span></p>`).join('');
+    }
+
+    function showResult() {
+        stopTimer();
+        document.getElementById('screen-quiz').classList.add('hidden');
+        document.getElementById('screen-result').classList.remove('hidden');
+
+        const totalQ = currentLesson.questions.length;
+        document.getElementById('result-score').innerText = `${score} / ${totalQ}`;
+        
+        let msg = "Em đã hoàn thành rất tốt bài học!";
+        if(score === totalQ) {
+            msg = "🌟 Tuyệt vời! Em đạt điểm tuyệt đối và nắm rất chắc kiến thức SGK!";
+            try { confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } }); } catch(e){}
+        } else if(score >= totalQ / 2) {
+            msg = "👍 Khá tốt! Em hãy ôn lại một chút để đạt điểm cao hơn nhé.";
+        } else {
+            msg = "💪 Cố gắng lên em! Hãy đọc lại sách giáo khoa Tin học để nắm vững hơn.";
+        }
+        document.getElementById('result-message').innerText = msg;
+
+        // Đẩy điểm số mới lên hệ thống xếp hạng trực tuyến chung cho tất cả mọi người trên mọi thiết bị
+        const newEntry = {
+            name: `${currentUser.name} (Lớp ${currentUser.studentClass})`,
+            studentClass: currentUser.studentClass,
+            score: score * 5, // scale out of 25
+            grade: currentUser.grade,
+            timestamp: new Date().getTime()
+        };
+        syncAndPushScore(newEntry);
+        renderReview();
+    }
+
+    function renderLeaderboard() {
+        const container = document.getElementById('leaderboard-container');
+        container.innerHTML = '';
+        if (leaderboard.length === 0) { container.innerHTML = '<p class="text-center text-sm text-gray-500 py-6">Chưa có học sinh nào hoàn thành bài học. Hãy là người đầu tiên nhé! 🌟</p>'; return; }
+
+        leaderboard.slice(0, 10).forEach((item, idx) => {
+            let medalColor = "bg-gray-100 text-gray-700";
+            if(idx === 0) medalColor = "bg-yellow-100 text-yellow-700 font-bold";
+            else if(idx === 1) medalColor = "bg-slate-200 text-slate-700 font-bold";
+            else if(idx === 2) medalColor = "bg-amber-100 text-amber-800 font-bold";
+
+            const row = document.createElement('div');
+            row.className = 'flex items-center justify-between p-3 rounded-xl border border-gray-100 bg-slate-50/50 text-sm';
+            row.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-7 h-7 rounded-lg ${medalColor} flex items-center justify-center text-xs">
+                        ${idx + 1}
+                    </div>
+                    <div>
+                        <div class="font-bold text-gray-800 text-xs sm:text-sm">${item.name}</div>
+                        <div class="text-[10px] text-gray-500">Khối lớp ${item.grade || 3}</div>
+                    </div>
+                </div>
+                <div class="font-extrabold text-blue-600 text-sm">${item.score} đ</div>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    function openModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+    }
+    </script>
+</body>
+</html>
